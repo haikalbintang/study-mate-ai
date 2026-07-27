@@ -65,7 +65,7 @@ export default function PomodoroApp() {
   }
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-[#f6f4ee] font-sans p-6 box-border">
-      <div className="bg-white rounded-3xl pt-8 px-9 pb-7 w-90 max-w-full shadow-xl border border-[#ececE4] text-center">
+      <div className="bg-white rounded-3xl pt-8 px-9 pb-7 w-90 max-w-full shadow-lg border border-[#ececE4] text-center">
         <nav className="flex justify-center gap-5 mb-5">
           {MODES.map((mode) => (
             <button
