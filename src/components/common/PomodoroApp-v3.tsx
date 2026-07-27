@@ -82,7 +82,7 @@ export default function PomodoroApp() {
           ))}
         </nav>
 
-        <div className="relative flex items-center justify-center mx-auto mb-6 w-70 h-70">
+        <div className="relative flex items-center justify-center mx-auto mb-6 w-64 h-64">
           <svg width="280" height="280" viewBox="0 0 280 280">
             <circle
               cx="140"
