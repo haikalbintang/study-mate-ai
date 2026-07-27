@@ -22,12 +22,12 @@ export default defineConfig({
 
         icons: [
           {
-            src: "stopwatch-svgrepo-com-192x192.png",
+            src: "stopwatch-svgrepo-com-192x192-2.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "stopwatch-svgrepo-com-512x512.png",
+            src: "stopwatch-svgrepo-com-512x512-2.png",
             sizes: "512x512",
             type: "image/png",
           },
