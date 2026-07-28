@@ -1,17 +1,4 @@
-type ModeKey = 0 | 1 | 2;
-
-interface ModeConfig {
-  key: ModeKey;
-  label: string;
-  minutes: number;
-  color: string;
-}
-
-const MODES: ModeConfig[] = [
-  { key: 0, label: "Focus", minutes: 25, color: "#c25b3a" },
-  { key: 1, label: "Short Break", minutes: 5, color: "#3a7d63" },
-  { key: 2, label: "Long Break", minutes: 15, color: "#3a5f7d" },
-];
+import { MODES } from "../../data/shared";
 
 export default function Dashboard() {
   return (

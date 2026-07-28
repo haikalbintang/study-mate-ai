@@ -1,33 +1,15 @@
 import { useRef, useEffect, useState } from "react";
+import { MODES } from "@/data/shared";
+import { formatTime } from "@/utils/helper";
+import type { ModeKey } from "@/types/shared";
 
-type ModeKey = 0 | 1 | 2;
-
-interface ModeConfig {
-  key: ModeKey;
-  label: string;
-  minutes: number;
-  color: string;
-}
-const MODES: ModeConfig[] = [
-  { key: 0, label: "Focus", minutes: 25, color: "#c25b3a" },
-  { key: 1, label: "Short Break", minutes: 5, color: "#3a7d63" },
-  { key: 2, label: "Long Break", minutes: 15, color: "#3a5f7d" },
-];
-
-function formatTime(totalSeconds: number): string {
-  const m = Math.floor(totalSeconds / 60);
-  const s = totalSeconds % 60;
-  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}
-
-export default function PomodoroApp() {
+export default function Timer() {
   const [mode, setMode] = useState<ModeKey>(0);
   const [isRunning, setIsRunning] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(MODES[mode].minutes * 60);
-  const [showSettings, setShowSettings] = useState(false);
+  const [showSettings, setShowSettings] = useState(true);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const totalSeconds = MODES[mode].minutes * 60;
 
   useEffect(() => {
     if (!isRunning) return;
@@ -48,6 +30,8 @@ export default function PomodoroApp() {
     };
   }, [isRunning]);
 
+  const totalSeconds = MODES[mode].minutes * 60;
+  const progress = 1 - secondsLeft / totalSeconds;
   const activeColor = MODES[mode].color;
 
   function handleSelectMode(key: ModeKey) {
@@ -63,21 +47,29 @@ export default function PomodoroApp() {
   function handleToggleSettings() {
     setShowSettings((s) => !s);
   }
+
+  const radius = 120;
+  const circumference = 2 * Math.PI * radius;
+  const dashOffset = circumference * (1 - progress);
+
   return (
     <div className="min-h-full w-full flex items-start md:items-center justify-center bg-[#f6f4ee] font-sans p-6 box-border">
       <div className="bg-white rounded-3xl pt-8 px-9 pb-7 w-90 max-w-full shadow-lg border border-[#ececE4] text-center">
         <nav className="flex justify-center gap-5 mb-5">
-          {MODES.map((mode) => (
+          {MODES.map((m) => (
             <button
-              key={mode.label}
+              key={m.key}
               className={`bg-transparent text-sm font-medium py-1.5 px-0.5 cursor-pointer text-[#8a8a86] border-b-[3px] border-[#8a8a86] `}
               style={{
-                color: mode.color,
-                borderBottom: `3px solid ${mode.color}`,
+                color: mode === m.key ? m.color : "#8a8a86",
+                borderBottom:
+                  mode === m.key
+                    ? `3px solid ${m.color}`
+                    : "3px solid transparent",
               }}
-              onClick={() => handleSelectMode(mode.key)}
+              onClick={() => handleSelectMode(m.key)}
             >
-              {mode.label}
+              {m.label}
             </button>
           ))}
         </nav>
@@ -87,7 +79,7 @@ export default function PomodoroApp() {
             <circle
               cx="140"
               cy="140"
-              r="120"
+              r={radius}
               fill="none"
               stroke="#e9e7e0"
               strokeWidth="10"
@@ -95,13 +87,13 @@ export default function PomodoroApp() {
             <circle
               cx="140"
               cy="140"
-              r="120"
+              r={radius}
               fill="none"
-              stroke="red"
+              stroke={activeColor}
               strokeWidth="10"
               strokeLinecap="round"
-              strokeDasharray={2 * Math.PI * 120}
-              strokeDashoffset={2 * Math.PI * 120}
+              strokeDasharray={circumference}
+              strokeDashoffset={dashOffset}
               transform="rotate(-90 140 140)"
               style={{ transition: "stroke-dashoffset 1s linear" }}
             />
