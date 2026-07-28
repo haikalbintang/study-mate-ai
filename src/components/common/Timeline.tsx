@@ -104,7 +104,7 @@ export default function Timeline() {
 
   return (
     <div className="min-h-full w-full flex items-start md:items-center justify-center bg-[#f6f4ee] font-sans p-6 box-border">
-      <div className="bg-white rounded-3xl pt-8 px-9 pb-7 w-90 max-w-full shadow-lg border border-[#ececE4]">
+      <div className="max-h-screen bg-white rounded-3xl pt-8 px-9 pb-7 w-90 max-w-full shadow-lg border border-[#ececE4]">
         <div>
           <div
             className="flex items-start justify-between mb-3
@@ -173,7 +173,7 @@ export default function Timeline() {
           </div>
 
           <div
-            className="max-h-105 overflow-y-auto border border-[#ececE4] rounded-xl bg-[#fbfaf7] pt-6
+            className="h-96 overflow-y-auto border border-[#ececE4] rounded-xl bg-[#fbfaf7] pt-6
 "
           >
             <div

@@ -17,8 +17,8 @@ const NAV_ITEMS: { key: ViewKey; label: string; icon: string }[] = [
 function App() {
   const [activeView, setActiveView] = useState<ViewKey>("timer");
   return (
-    <>
-      <div className="h-[calc(100vh-69px)] overflow-y-auto">
+    <div className="flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 overflow-y-auto pb-17">
         {activeView === "dashboard" && <Dashboard />}
         {activeView === "timer" && <PomodoroApp />}
         {activeView === "timeline" && <Timeline />}
@@ -46,7 +46,7 @@ function App() {
           })}
         </nav>
       </div>
-    </>
+    </div>
   );
 }
 
