@@ -173,7 +173,7 @@ export default function Timeline() {
           </div>
 
           <div
-            className="h-[calc(100vh-160px)] overflow-y-auto border border-[#ececE4] rounded-xl bg-[#fbfaf7] pt-6
+            className="h-[calc(100vh-301px)] overflow-y-auto border border-[#ececE4] rounded-xl bg-[#fbfaf7] pt-6
 "
           >
             <div
