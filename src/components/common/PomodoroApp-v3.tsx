@@ -24,7 +24,7 @@ export default function PomodoroApp() {
   const [mode, setMode] = useState<ModeKey>(0);
   const [isRunning, setIsRunning] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(MODES[mode].minutes * 60);
-  const [showSettings, setShowSettings] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const totalSeconds = MODES[mode].minutes * 60;

@@ -16,7 +16,7 @@ const MODES: ModeConfig[] = [
 export default function Dashboard() {
   return (
     <div className="min-h-full w-full flex items-start md:items-center justify-center bg-[#f6f4ee] font-sans p-6 box-border">
-      <div className="bg-white rounded-3xl pt-8 px-9 pb-7 w-90 max-w-full shadow-lg border border-[#ececE4] text-center">
+      <div className="bg-white rounded-3xl pt-8 px-9 pb-7 w-90 max-w-full shadow-lg border border-[#ececE4]">
         <div>
           <div
             className="flex items-start justify-between mb-3
@@ -101,7 +101,7 @@ export default function Dashboard() {
 "
               >
                 <div
-                  className="w-20.5 text-[#5a5850] shrink-0 text-left
+                  className="w-20.5 text-[#5a5850] shrink-0
 "
                 >
                   {mode.label}
