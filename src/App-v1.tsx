@@ -18,13 +18,13 @@ function App() {
   const [activeView, setActiveView] = useState<ViewKey>("timer");
   return (
     <>
-      <div className="pb-17">
+      <div className="h-[calc(100vh-69px)] overflow-y-auto">
         {activeView === "dashboard" && <Dashboard />}
         {activeView === "timer" && <PomodoroApp />}
         {activeView === "timeline" && <Timeline />}
         {activeView === "settings" && <Settings />}
       </div>
-      <div className="fixed bottom-0 left-0 z-50 bg-white w-full shadow-xl border-t border-[#d7d7c0]">
+      <div className="h-16.75 fixed bottom-0 left-0 z-50 bg-white w-full shadow-xl border-t border-[#d7d7c0]">
         <nav className="flex border-b border-[#ececE4] p-2 gap-1">
           {NAV_ITEMS.map((item) => {
             const active = activeView === item.key;
