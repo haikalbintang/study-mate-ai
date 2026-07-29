@@ -127,7 +127,7 @@ export default function Timeline() {
                 return (
                   <div
                     key={session.id}
-                    className="absolute left-10.5 right-2.5 rounded-sm overflow-hidden box-border px-1.5 py-0.75
+                    className="absolute left-9 right-3 rounded-sm overflow-hidden box-border px-1.5 py-0.75
 "
                     style={{
                       top: `${top}px`,

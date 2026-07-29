@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import { MODES } from "@/data/shared";
-import { formatTime } from "@/utils/helper";
+import { formatTime, onTimerComplete } from "@/utils/helper";
 import type { ModeKey } from "@/types/shared";
 
 export default function Timer() {
@@ -40,6 +40,12 @@ export default function Timer() {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [isRunning]);
+
+  useEffect(() => {
+    if (secondsLeft === 0) {
+      onTimerComplete();
+    }
+  }, [secondsLeft]);
 
   const totalSeconds = durations[mode] * 60;
   const progress = 1 - secondsLeft / totalSeconds;
