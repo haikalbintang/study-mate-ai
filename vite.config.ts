@@ -13,6 +13,7 @@ export default defineConfig({
       strategies: "injectManifest",
       srcDir: "src",
       filename: "sw.js",
+      injectRegister: "auto",
       injectManifest: {
         injectionPoint: "self.__WB_MANIFEST",
       },

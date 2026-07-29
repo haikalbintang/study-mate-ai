@@ -140,32 +140,36 @@ export async function onTimerComplete() {
   }
 
   // System notification (works even if app is in background tab)
-  if (Notification.permission === "granted") {
-    const notif = new Notification("Time's up! ⏰", {
-      body: "Your pomodoro session has ended.",
-      icon: "stopwatch-svgrepo-com-192x192-3.png",
-      tag: "pomodoro-done",
-      requireInteraction: true, // keeps it on screen until dismissed (desktop mostly)
-    });
-    notif.onclick = () => {
-      window.focus();
-      notif.close();
-    };
-  } else if ("serviceWorker" in navigator) {
-    try {
-      const reg = await navigator.serviceWorker.ready;
-      await reg.showNotification("Time's up! ⏰", {
+  if (
+    typeof Notification !== "undefined" &&
+    Notification.permission === "granted"
+  ) {
+    if ("serviceWorker" in navigator) {
+      try {
+        const reg = await navigator.serviceWorker.ready;
+        await reg.showNotification("Time's up! ⏰", {
+          body: "Your pomodoro session has ended.",
+          icon: "/stopwatch-svgrepo-com-192x192-3.png",
+          tag: "pomodoro-done",
+          vibrate: [500, 200, 500, 200, 500], // some Android browsers also support vibrate here
+          renotify: true,
+          requireInteraction: true,
+        } as NotificationOptions & { vibrate?: number[]; renotify?: boolean });
+      } catch (err) {
+        console.error("Notification failed:", err);
+      }
+    } else {
+      const notif = new Notification("Time's up! ⏰", {
         body: "Your pomodoro session has ended.",
-        icon: "stopwatch-svgrepo-com-192x192-3.png",
+        icon: "/stopwatch-svgrepo-com-192x192-3.png",
         tag: "pomodoro-done",
-        vibrate: [500, 200, 500, 200, 500], // some Android browsers also support vibrate here
-        renotify: true,
-        requireInteraction: true,
-      } as NotificationOptions & { vibrate?: number[]; renotify?: boolean });
-    } catch (err) {
-      console.error("Notification failed:", err);
+        requireInteraction: true, // keeps it on screen until dismissed (desktop mostly)
+      });
+      notif.onclick = () => {
+        window.focus();
+        notif.close();
+      };
     }
   }
-
-  // Optionally stop the alarm sound when user interacts (e.g. a "Dismiss" button)
 }
+// Optionally stop the alarm sound when user interacts (e.g. a "Dismiss" button)
