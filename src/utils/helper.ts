@@ -128,7 +128,7 @@ export async function requestNotificationPermission() {
   return permission === "granted";
 }
 
-export function onTimerComplete() {
+export async function onTimerComplete() {
   // Sound
   const alarmSound = new Audio("/alarm.mp3"); // put a short mp3/ogg in your public folder
   alarmSound.loop = false;
@@ -140,17 +140,19 @@ export function onTimerComplete() {
   }
 
   // System notification (works even if app is in background tab)
-  if (Notification.permission === "granted") {
-    const notif = new Notification("Time's up! ⏰", {
-      body: "Your pomodoro session has ended.",
-      icon: "stopwatch-svgrepo-com-192x192-3.png",
-      tag: "pomodoro-done",
-      requireInteraction: true, // keeps it on screen until dismissed (desktop mostly)
-    });
-    notif.onclick = () => {
-      window.focus();
-      notif.close();
-    };
+  if (Notification.permission === "granted" && "serviceWorker" in navigator) {
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      await reg.showNotification("Time's up! ⏰", {
+        body: "Your pomodoro session has ended.",
+        icon: "/icons/icon-192.png",
+        tag: "pomodoro-done",
+        // vibrate: [500, 200, 500, 200, 500], // some Android browsers also support vibrate here
+        requireInteraction: true,
+      });
+    } catch (err) {
+      console.error("Notification failed:", err);
+    }
   }
 
   // Optionally stop the alarm sound when user interacts (e.g. a "Dismiss" button)
