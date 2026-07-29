@@ -1,4 +1,5 @@
-import { NAV_ITEMS, type ViewKey } from "../data/shared";
+import { NAV_ITEMS } from "../data/shared";
+import { type ViewKey } from "../types/shared";
 
 interface NavbarProps {
   activeView: ViewKey;
