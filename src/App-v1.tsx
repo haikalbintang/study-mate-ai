@@ -9,10 +9,6 @@ import NavBar from "./layouts/NavBar";
 
 function App() {
   const [activeView, setActiveView] = useState<ViewKey>("timer");
-  // in your main app file
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/sw.js");
-  }
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
