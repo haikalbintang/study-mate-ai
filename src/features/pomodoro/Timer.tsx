@@ -6,8 +6,19 @@ import type { ModeKey } from "@/types/shared";
 export default function Timer() {
   const [mode, setMode] = useState<ModeKey>(0);
   const [isRunning, setIsRunning] = useState(false);
-  const [secondsLeft, setSecondsLeft] = useState(MODES[mode].minutes * 60);
   const [showSettings, setShowSettings] = useState(true);
+  const [durations, setDurations] = useState([
+    MODES[0].minutes,
+    MODES[1].minutes,
+    MODES[2].minutes,
+  ]);
+  const [secondsLeft, setSecondsLeft] = useState(durations[mode] * 60);
+
+  const [inputValues, setInputValues] = useState<string[]>([
+    String(MODES[0].minutes),
+    String(MODES[1].minutes),
+    String(MODES[2].minutes),
+  ]);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -30,7 +41,7 @@ export default function Timer() {
     };
   }, [isRunning]);
 
-  const totalSeconds = MODES[mode].minutes * 60;
+  const totalSeconds = durations[mode] * 60;
   const progress = 1 - secondsLeft / totalSeconds;
   const activeColor = MODES[mode].color;
 
@@ -38,14 +49,43 @@ export default function Timer() {
     setMode(key);
     setIsRunning(false);
 
-    const newTotalSeconds = MODES[key].minutes * 60;
+    const newTotalSeconds = durations[key] * 60;
     setSecondsLeft(newTotalSeconds);
+  }
+
+  function handleReset() {
+    setIsRunning(false);
+    setSecondsLeft(durations[mode] * 60);
   }
   function handlePauseStart() {
     setIsRunning((r) => !r);
   }
   function handleToggleSettings() {
     setShowSettings((s) => !s);
+  }
+
+  function handleDurationChange(key: ModeKey, value: string) {
+    const clamped = Math.max(1, Math.min(120, Number(value) || 1));
+    setInputValues((prev) => {
+      const nextArray = [...prev];
+      nextArray[key] = String(clamped);
+      return nextArray;
+    });
+  }
+
+  function handleDurationBlur(key: ModeKey, value: string) {
+    const clamped = Math.max(1, Math.min(120, Number(value) || 1));
+    setInputValues((prev) => {
+      const nextArray = [...prev];
+      nextArray[key] = String(clamped);
+      return nextArray;
+    });
+    setDurations((prev) => {
+      const nextArray = [...prev];
+      nextArray[key] = clamped;
+      return nextArray;
+    });
+    if (mode === key) setSecondsLeft(clamped * 60);
   }
 
   const radius = 120;
@@ -109,7 +149,12 @@ export default function Timer() {
         </div>
 
         <div className="flex items-center justify-center gap-4 mb-4">
-          <button className="border border-[#e4e2da] bg-white w-10.5 h-10.5 rounded-full text-lg cursor-pointer text-[#5a5850] transition-colors duration-150 ease-out">
+          <button
+            className="border border-[#e4e2da] bg-white w-10.5 h-10.5 rounded-full text-lg cursor-pointer text-[#5a5850] transition-colors duration-150 ease-out"
+            onClick={handleReset}
+            aria-label="Reset timer"
+            title="Reset"
+          >
             ↺
           </button>
           <button
@@ -137,16 +182,21 @@ export default function Timer() {
 
         {showSettings && (
           <div className="mt-5 pt-5 border-t border-[#ececE4] flex flex-col gap-2.5 text-left">
-            {MODES.map((mode) => (
-              <label className="flex items-center justify-between text-sm">
-                <span className="font-medium" style={{ color: mode.color }}>
-                  {mode.label}
+            {MODES.map((m) => (
+              <label
+                key={m.key}
+                className="flex items-center justify-between text-sm"
+              >
+                <span className="font-medium" style={{ color: m.color }}>
+                  {m.label}
                 </span>
                 <input
                   type="number"
                   min={1}
                   max={120}
-                  value={0}
+                  value={inputValues[m.key]}
+                  onChange={(e) => handleDurationChange(m.key, e.target.value)}
+                  onBlur={(e) => handleDurationBlur(m.key, e.target.value)}
                   className="w-14 py-1 px-1.5 rounded-md border border-[#d8d6cd] text-sm text-center"
                 />
               </label>

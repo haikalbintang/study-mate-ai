@@ -17,3 +17,5 @@ export interface SessionRecord {
   end: number; // epoch ms
   completed: boolean; // true = selesai penuh, false = dihentikan lebih awal
 }
+
+export type DurationsState = Record<ModeKey, number | "">;
