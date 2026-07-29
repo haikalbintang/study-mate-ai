@@ -158,9 +158,10 @@ export async function onTimerComplete() {
         body: "Your pomodoro session has ended.",
         icon: "stopwatch-svgrepo-com-192x192-3.png",
         tag: "pomodoro-done",
-        // vibrate: [500, 200, 500, 200, 500], // some Android browsers also support vibrate here
+        vibrate: [500, 200, 500, 200, 500], // some Android browsers also support vibrate here
+        renotify: true,
         requireInteraction: true,
-      });
+      } as NotificationOptions);
     } catch (err) {
       console.error("Notification failed:", err);
     }
