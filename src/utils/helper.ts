@@ -121,6 +121,13 @@ export function buildSampleSession() {
   ];
 }
 
+export async function requestNotificationPermission() {
+  if (!("Notification" in window)) return false;
+  if (Notification.permission === "granted") return true;
+  const permission = await Notification.requestPermission();
+  return permission === "granted";
+}
+
 export function onTimerComplete() {
   // Sound
   const alarmSound = new Audio("/alarm.mp3"); // put a short mp3/ogg in your public folder

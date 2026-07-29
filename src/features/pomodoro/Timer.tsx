@@ -1,6 +1,10 @@
 import { useRef, useEffect, useState } from "react";
 import { MODES } from "@/data/shared";
-import { formatTime, onTimerComplete } from "@/utils/helper";
+import {
+  formatTime,
+  onTimerComplete,
+  requestNotificationPermission,
+} from "@/utils/helper";
 import type { ModeKey } from "@/types/shared";
 
 export default function Timer() {
@@ -65,6 +69,7 @@ export default function Timer() {
   }
   function handlePauseStart() {
     setIsRunning((r) => !r);
+    requestNotificationPermission();
   }
   function handleToggleSettings() {
     setShowSettings((s) => !s);
