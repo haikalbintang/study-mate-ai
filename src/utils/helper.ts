@@ -161,7 +161,7 @@ export async function onTimerComplete() {
         vibrate: [500, 200, 500, 200, 500], // some Android browsers also support vibrate here
         renotify: true,
         requireInteraction: true,
-      } as NotificationOptions);
+      } as NotificationOptions & { vibrate?: number[]; renotify?: boolean });
     } catch (err) {
       console.error("Notification failed:", err);
     }
