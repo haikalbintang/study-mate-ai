@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { MODES, HOUR_HEIGHT } from "@/data/shared";
-import { buildSampleSession, minutesSinceMidnight } from "../../utils/helper";
+import { minutesSinceMidnight } from "../../utils/helper";
 import usePomodoro from "@/hooks/usePomodoro";
 import type { Session } from "@/types/shared";
+import Title from "@/components/common/Title";
+import Subtitle from "@/components/common/Subtitle";
 
 export default function Timeline() {
   const [zoomScale, setZoomScale] = useState(1);
@@ -42,18 +44,8 @@ export default function Timeline() {
 "
           >
             <div>
-              <div
-                className="text-[15px] font-semibold text-[#2b2a26]
-"
-              >
-                Timeline hari ini
-              </div>
-              <div
-                className="text-xs text-[#9a988f] mt-0.5 capitalize
-"
-              >
-                selasa, 28 juli
-              </div>
+              <Title>Today's Timeline</Title>
+              <Subtitle>tuesday, July 8</Subtitle>
             </div>
             <div className="flex items-center gap-2">
               <button

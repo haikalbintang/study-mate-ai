@@ -8,7 +8,7 @@ export interface ModeConfig {
   color: string;
 }
 
-export type Durations = Record<ModeKey, number>;
+export type Durations = number[];
 
 export interface SessionRecord {
   id: string;
@@ -47,4 +47,29 @@ export interface PomodoroContextValue {
   finishSession: () => void;
   cancelSession: () => void;
   clearSessions: () => void;
+
+  mode: ModeKey;
+  isRunning: boolean;
+  showSettings: boolean;
+  durations: Durations;
+  secondsLeftByMode: number[];
+  inputValues: string[];
+  completedFocusSessions: number;
+  setMode: (mode: ModeKey) => void;
+  setDurations: (durations: Durations) => void;
+  setInputValues: (inputValues: string[]) => void;
+  setCompletedFocusSessions: (completedFocusSessions: number) => void;
+
+  actionButtonColor: string;
+  progress: number;
+  handleSelectMode: (key: ModeKey) => void;
+  handleReset: () => void;
+  handlePauseStart: () => void;
+  handleToggleSettings: () => void;
+  handleDurationChange: (key: ModeKey, value: string) => void;
+  handleDurationBlur: (key: ModeKey, value: string) => void;
+  activeColor: string;
+  secondsLeft: number;
+  totalSeconds: number;
+  isFinished: boolean;
 }
