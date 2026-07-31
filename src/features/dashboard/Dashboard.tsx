@@ -52,7 +52,7 @@ export default function Dashboard() {
                 className="text-[11px] text-[#9a988f] mt-1 leading-[1.3]
 "
               >
-                Totoal waktu focus
+                Total waktu focus
               </div>
             </div>
             <div className="bg-[#f8f7f2] rounded-xl px-2 py-3.5 text-center">

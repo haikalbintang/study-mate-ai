@@ -16,29 +16,104 @@ export function formatDurationMinutes(ms: number): string {
   return `${mins} menit`;
 }
 
-// Simple two-tone chime using the Web Audio API — no external assets needed.
-export function playChime(): void {
+/**
+ * Plays a soft 2-note chime using Web Audio API.
+ */
+async function playChimeSound(): Promise<void> {
   try {
-    const AudioContextClass = window.AudioContext;
+    const AudioContextClass =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext;
+
+    if (!AudioContextClass) return;
+
     const ctx = new AudioContextClass();
+
+    // Ensure AudioContext is running (handles browser autoplay policies)
+    if (ctx.state === "suspended") {
+      await ctx.resume();
+    }
+
     const notes = [523.25, 659.25]; // C5, E5
+    const noteDuration = 0.4;
+    const noteInterval = 0.2;
+
     notes.forEach((freq, i) => {
+      const startTime = ctx.currentTime + i * noteInterval;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
+
       osc.type = "sine";
       osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.2);
-      gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + i * 0.2 + 0.02);
-      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + i * 0.2 + 0.35);
+
+      // Envelope: Fade in quickly, then fade out smoothly
+      gain.gain.setValueAtTime(0, startTime);
+      gain.gain.linearRampToValueAtTime(0.15, startTime + 0.02);
+      gain.gain.linearRampToValueAtTime(0, startTime + 0.35);
+
       osc.connect(gain);
       gain.connect(ctx.destination);
-      osc.start(ctx.currentTime + i * 0.2);
-      osc.stop(ctx.currentTime + i * 0.2 + 0.4);
+
+      osc.start(startTime);
+      osc.stop(startTime + noteDuration);
     });
-  } catch (e) {
-    console.error(e);
-    // Audio not available — fail silently.
+
+    // Clean up AudioContext after sound finishes playing
+    const totalDuration = notes.length * noteInterval + noteDuration;
+    setTimeout(() => {
+      ctx.close().catch(() => {});
+    }, totalDuration * 1000);
+  } catch (err) {
+    console.error("Audio playback failed:", err);
   }
+}
+
+/**
+ * Triggers system notification across Service Worker or standard Notification API.
+ */
+async function sendNotification(): Promise<void> {
+  const title = "Time's up! ⏰";
+  const options = {
+    body: "Your pomodoro session has ended.",
+    icon: "/stopwatch-svgrepo-com-192x192-3.png",
+    tag: "pomodoro-done",
+    // vibrate: [500, 200, 500, 200, 500],
+    renotify: true,
+    requireInteraction: true,
+  };
+
+  try {
+    if (
+      typeof Notification !== "undefined" &&
+      Notification.permission === "granted"
+    ) {
+      const notif = new Notification(title, options);
+      notif.onclick = () => {
+        window.focus();
+        notif.close();
+      };
+    }
+    if ("serviceWorker" in navigator) {
+      const reg = await navigator.serviceWorker.ready;
+      await reg.showNotification(title, options);
+    }
+  } catch (err) {
+    console.error("Notification failed:", err);
+  }
+}
+
+/**
+ * Executes full alert sequence: Vibration, Notification, and Audio Chime.
+ */
+export async function playChime(): Promise<void> {
+  // 1. Device Vibration (Android Chrome)
+  if ("vibrate" in navigator) {
+    navigator.vibrate([500, 200, 500, 200, 500]);
+  }
+
+  // 2. System Notification & Audio Chime in parallel
+  await Promise.allSettled([sendNotification(), playChimeSound()]);
 }
 
 export function minutesSinceMidnight(ms: number): number {
@@ -173,3 +248,7 @@ export async function onTimerComplete() {
   }
 }
 // Optionally stop the alarm sound when user interacts (e.g. a "Dismiss" button)
+
+export function clampDuration(value: string): number {
+  return Math.max(1, Math.min(120, Number(value) || 1));
+}

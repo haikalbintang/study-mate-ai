@@ -1,4 +1,10 @@
-// import React, { useState, useEffect, useRef, useCallback, CSSProperties } from "react";
+// import React, {
+//   useState,
+//   useEffect,
+//   useRef,
+//   useCallback,
+//   CSSProperties,
+// } from "react";
 
 // // ---- Types --------------------------------------------------------------
 // type ModeKey = "focus" | "short" | "long";
@@ -43,7 +49,10 @@
 // }
 
 // function formatClock(ms: number): string {
-//   return new Date(ms).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+//   return new Date(ms).toLocaleTimeString([], {
+//     hour: "2-digit",
+//     minute: "2-digit",
+//   });
 // }
 
 // function formatDurationMinutes(ms: number): string {
@@ -96,7 +105,8 @@
 //   const [mode, setMode] = useState<ModeKey>("focus");
 //   const [secondsLeft, setSecondsLeft] = useState<number>(durations.focus * 60);
 //   const [isRunning, setIsRunning] = useState<boolean>(false);
-//   const [completedFocusSessions, setCompletedFocusSessions] = useState<number>(0);
+//   const [completedFocusSessions, setCompletedFocusSessions] =
+//     useState<number>(0);
 //   const [sessions, setSessions] = useState<SessionRecord[]>([]);
 
 //   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -127,14 +137,21 @@
 //   const logSession = useCallback(
 //     (finishedMode: ModeKey, completed: boolean) => {
 //       const end = Date.now();
-//       const start = sessionStartRef.current ?? end - durations[finishedMode] * 60000;
+//       const start =
+//         sessionStartRef.current ?? end - durations[finishedMode] * 60000;
 //       setSessions((prev) => [
 //         ...prev,
-//         { id: `${end}-${Math.random().toString(36).slice(2, 7)}`, mode: finishedMode, start, end, completed },
+//         {
+//           id: `${end}-${Math.random().toString(36).slice(2, 7)}`,
+//           mode: finishedMode,
+//           start,
+//           end,
+//           completed,
+//         },
 //       ]);
 //       sessionStartRef.current = null;
 //     },
-//     [durations]
+//     [durations],
 //   );
 
 //   const goToNextMode = useCallback(() => {
@@ -225,15 +242,26 @@
 //   const now = Date.now();
 //   const todaySessions = sessions.filter((s) => isSameDay(s.start, now));
 //   const minutesByMode = (list: SessionRecord[], key: ModeKey) =>
-//     Math.round(list.filter((s) => s.mode === key).reduce((sum, s) => sum + (s.end - s.start), 0) / 60000);
+//     Math.round(
+//       list
+//         .filter((s) => s.mode === key)
+//         .reduce((sum, s) => sum + (s.end - s.start), 0) / 60000,
+//     );
 
 //   const todayFocusMin = minutesByMode(todaySessions, "focus");
 //   const todayShortMin = minutesByMode(todaySessions, "short");
 //   const todayLongMin = minutesByMode(todaySessions, "long");
-//   const todayFocusCount = todaySessions.filter((s) => s.mode === "focus" && s.completed).length;
+//   const todayFocusCount = todaySessions.filter(
+//     (s) => s.mode === "focus" && s.completed,
+//   ).length;
 //   const todayInterrupted = todaySessions.filter((s) => !s.completed).length;
 //   const allTimeFocusMin = minutesByMode(sessions, "focus");
-//   const maxDashboardMin = Math.max(todayFocusMin, todayShortMin, todayLongMin, 1);
+//   const maxDashboardMin = Math.max(
+//     todayFocusMin,
+//     todayShortMin,
+//     todayLongMin,
+//     1,
+//   );
 
 //   return (
 //     <div style={styles.page}>
@@ -275,25 +303,37 @@
 //           {activeView === "timer" && (
 //             <div style={styles.centerCol}>
 //               <div style={styles.tabRow}>
-//                 {(Object.entries(MODES) as [ModeKey, ModeConfig][]).map(([key, m]) => (
-//                   <button
-//                     key={key}
-//                     className="pomo-tab"
-//                     onClick={() => handleSelectMode(key)}
-//                     style={{
-//                       ...styles.tab,
-//                       color: mode === key ? m.color : "#8a8a86",
-//                       borderBottom: mode === key ? `2px solid ${m.color}` : "2px solid transparent",
-//                     }}
-//                   >
-//                     {m.label}
-//                   </button>
-//                 ))}
+//                 {(Object.entries(MODES) as [ModeKey, ModeConfig][]).map(
+//                   ([key, m]) => (
+//                     <button
+//                       key={key}
+//                       className="pomo-tab"
+//                       onClick={() => handleSelectMode(key)}
+//                       style={{
+//                         ...styles.tab,
+//                         color: mode === key ? m.color : "#8a8a86",
+//                         borderBottom:
+//                           mode === key
+//                             ? `2px solid ${m.color}`
+//                             : "2px solid transparent",
+//                       }}
+//                     >
+//                       {m.label}
+//                     </button>
+//                   ),
+//                 )}
 //               </div>
 
 //               <div style={styles.ringWrap}>
 //                 <svg width="280" height="280" viewBox="0 0 280 280">
-//                   <circle cx="140" cy="140" r={radius} fill="none" stroke="#e9e7e0" strokeWidth="10" />
+//                   <circle
+//                     cx="140"
+//                     cy="140"
+//                     r={radius}
+//                     fill="none"
+//                     stroke="#e9e7e0"
+//                     strokeWidth="10"
+//                   />
 //                   <circle
 //                     cx="140"
 //                     cy="140"
@@ -332,7 +372,11 @@
 //                   onClick={handleStartPause}
 //                   style={{ ...styles.mainBtn, background: activeColor }}
 //                 >
-//                   {isRunning ? "Pause" : secondsLeft === totalSeconds ? "Start" : "Resume"}
+//                   {isRunning
+//                     ? "Pause"
+//                     : secondsLeft === totalSeconds
+//                       ? "Start"
+//                       : "Resume"}
 //                 </button>
 //                 <button
 //                   className="pomo-icon-btn"
@@ -346,7 +390,8 @@
 //               </div>
 
 //               <div style={styles.footer}>
-//                 Focus sessions completed today: <strong>{completedFocusSessions}</strong>
+//                 Focus sessions completed today:{" "}
+//                 <strong>{completedFocusSessions}</strong>
 //               </div>
 //             </div>
 //           )}
@@ -356,7 +401,11 @@
 //               <div style={styles.panelHeader}>
 //                 <span style={styles.panelTitle}>Riwayat sesi</span>
 //                 {sortedSessions.length > 0 && (
-//                   <button className="pomo-clear" onClick={handleClearHistory} style={styles.clearBtn}>
+//                   <button
+//                     className="pomo-clear"
+//                     onClick={handleClearHistory}
+//                     style={styles.clearBtn}
+//                   >
 //                     Bersihkan
 //                   </button>
 //                 )}
@@ -364,16 +413,27 @@
 
 //               {sortedSessions.length === 0 ? (
 //                 <div style={styles.timelineEmpty}>
-//                   Belum ada sesi. Riwayat focus/break akan muncul di sini setelah kamu menyelesaikan sesi pertama.
+//                   Belum ada sesi. Riwayat focus/break akan muncul di sini
+//                   setelah kamu menyelesaikan sesi pertama.
 //                 </div>
 //               ) : (
 //                 <div style={styles.timelineList}>
 //                   {sortedSessions.map((s) => (
 //                     <div key={s.id} style={styles.timelineRow}>
-//                       <div style={{ ...styles.timelineDot, background: MODES[s.mode].color }} />
+//                       <div
+//                         style={{
+//                           ...styles.timelineDot,
+//                           background: MODES[s.mode].color,
+//                         }}
+//                       />
 //                       <div style={styles.timelineBar}>
 //                         <div style={styles.timelineRowTop}>
-//                           <span style={{ color: MODES[s.mode].color, fontWeight: 600 }}>
+//                           <span
+//                             style={{
+//                               color: MODES[s.mode].color,
+//                               fontWeight: 600,
+//                             }}
+//                           >
 //                             {MODES[s.mode].label}
 //                           </span>
 //                           <span style={styles.timelineTime}>
@@ -382,7 +442,12 @@
 //                         </div>
 //                         <div style={styles.timelineRowBottom}>
 //                           {formatDurationMinutes(s.end - s.start)}
-//                           {!s.completed && <span style={styles.timelineStopped}> · dihentikan lebih awal</span>}
+//                           {!s.completed && (
+//                             <span style={styles.timelineStopped}>
+//                               {" "}
+//                               · dihentikan lebih awal
+//                             </span>
+//                           )}
 //                         </div>
 //                       </div>
 //                     </div>
@@ -400,38 +465,60 @@
 
 //               <div style={styles.statGrid}>
 //                 <div style={styles.statCard}>
-//                   <div style={{ ...styles.statValue, color: MODES.focus.color }}>{todayFocusCount}</div>
+//                   <div
+//                     style={{ ...styles.statValue, color: MODES.focus.color }}
+//                   >
+//                     {todayFocusCount}
+//                   </div>
 //                   <div style={styles.statLabel}>Sesi focus selesai</div>
 //                 </div>
 //                 <div style={styles.statCard}>
-//                   <div style={{ ...styles.statValue, color: "#2b2a26" }}>{todayFocusMin}m</div>
+//                   <div style={{ ...styles.statValue, color: "#2b2a26" }}>
+//                     {todayFocusMin}m
+//                   </div>
 //                   <div style={styles.statLabel}>Total waktu focus</div>
 //                 </div>
 //                 <div style={styles.statCard}>
-//                   <div style={{ ...styles.statValue, color: "#2b2a26" }}>{todayInterrupted}</div>
+//                   <div style={{ ...styles.statValue, color: "#2b2a26" }}>
+//                     {todayInterrupted}
+//                   </div>
 //                   <div style={styles.statLabel}>Sesi dihentikan</div>
 //                 </div>
 //               </div>
 
 //               <div style={styles.panelSubTitle}>Distribusi waktu hari ini</div>
 //               <div style={styles.barList}>
-//                 {(Object.entries(MODES) as [ModeKey, ModeConfig][]).map(([key, m]) => {
-//                   const mins = key === "focus" ? todayFocusMin : key === "short" ? todayShortMin : todayLongMin;
-//                   const pct = Math.round((mins / maxDashboardMin) * 100);
-//                   return (
-//                     <div key={key} style={styles.barRow}>
-//                       <div style={styles.barLabel}>{m.label}</div>
-//                       <div style={styles.barTrack}>
-//                         <div style={{ ...styles.barFill, width: `${pct}%`, background: m.color }} />
+//                 {(Object.entries(MODES) as [ModeKey, ModeConfig][]).map(
+//                   ([key, m]) => {
+//                     const mins =
+//                       key === "focus"
+//                         ? todayFocusMin
+//                         : key === "short"
+//                           ? todayShortMin
+//                           : todayLongMin;
+//                     const pct = Math.round((mins / maxDashboardMin) * 100);
+//                     return (
+//                       <div key={key} style={styles.barRow}>
+//                         <div style={styles.barLabel}>{m.label}</div>
+//                         <div style={styles.barTrack}>
+//                           <div
+//                             style={{
+//                               ...styles.barFill,
+//                               width: `${pct}%`,
+//                               background: m.color,
+//                             }}
+//                           />
+//                         </div>
+//                         <div style={styles.barValue}>{mins}m</div>
 //                       </div>
-//                       <div style={styles.barValue}>{mins}m</div>
-//                     </div>
-//                   );
-//                 })}
+//                     );
+//                   },
+//                 )}
 //               </div>
 
 //               <div style={styles.dashboardFooter}>
-//                 Total waktu focus sepanjang waktu: <strong>{allTimeFocusMin} menit</strong>
+//                 Total waktu focus sepanjang waktu:{" "}
+//                 <strong>{allTimeFocusMin} menit</strong>
 //               </div>
 //             </div>
 //           )}
@@ -442,19 +529,25 @@
 //                 <span style={styles.panelTitle}>Pengaturan durasi</span>
 //               </div>
 //               <div style={styles.settingsPanel}>
-//                 {(Object.entries(MODES) as [ModeKey, ModeConfig][]).map(([key, m]) => (
-//                   <label key={key} style={styles.settingRow}>
-//                     <span style={{ color: m.color, fontWeight: 500 }}>{m.label} (menit)</span>
-//                     <input
-//                       type="number"
-//                       min={1}
-//                       max={120}
-//                       value={durations[key]}
-//                       onChange={(e) => handleDurationChange(key, e.target.value)}
-//                       style={styles.numberInput}
-//                     />
-//                   </label>
-//                 ))}
+//                 {(Object.entries(MODES) as [ModeKey, ModeConfig][]).map(
+//                   ([key, m]) => (
+//                     <label key={key} style={styles.settingRow}>
+//                       <span style={{ color: m.color, fontWeight: 500 }}>
+//                         {m.label} (menit)
+//                       </span>
+//                       <input
+//                         type="number"
+//                         min={1}
+//                         max={120}
+//                         value={durations[key]}
+//                         onChange={(e) =>
+//                           handleDurationChange(key, e.target.value)
+//                         }
+//                         style={styles.numberInput}
+//                       />
+//                     </label>
+//                   ),
+//                 )}
 //               </div>
 //             </div>
 //           )}
@@ -473,7 +566,8 @@
 //     alignItems: "flex-start",
 //     justifyContent: "center",
 //     background: "#f6f4ee",
-//     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+//     fontFamily:
+//       "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
 //     padding: "24px",
 //     boxSizing: "border-box",
 //   },
