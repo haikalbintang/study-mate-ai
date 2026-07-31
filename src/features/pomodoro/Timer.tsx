@@ -12,21 +12,13 @@ import usePomodoro from "@/hooks/usePomodoro";
 
 export default function Timer() {
   const {
-    mode,
     isRunning,
-    completedFocusSessions,
-    inputValues,
     showSettings,
 
     actionButtonColor,
-    progress,
-    handleSelectMode,
     handleReset,
     handlePauseStart,
     handleToggleSettings,
-    handleDurationChange,
-    handleDurationBlur,
-    activeColor,
     secondsLeft,
     totalSeconds,
     isFinished,
@@ -35,15 +27,9 @@ export default function Timer() {
   return (
     <Background>
       <Card>
-        <SessionNav mode={mode} onClick={handleSelectMode} />
+        <SessionNav />
 
-        <ProgressRing
-          activeColor={activeColor}
-          isRunning={isRunning}
-          secondsLeft={secondsLeft}
-          progress={progress}
-          completedFocusSessions={completedFocusSessions}
-        />
+        <ProgressRing />
 
         <ButtonsShell>
           <ResetButton onClick={handleReset} />
@@ -58,15 +44,9 @@ export default function Timer() {
           <SettingsButton onClick={handleToggleSettings} />
         </ButtonsShell>
 
-        <Summary completedFocusSessions={completedFocusSessions} />
+        <Summary />
 
-        {showSettings && (
-          <SettingsPanel
-            inputValues={inputValues}
-            onChange={handleDurationChange}
-            onBlur={handleDurationBlur}
-          />
-        )}
+        {showSettings && <SettingsPanel />}
       </Card>
     </Background>
   );

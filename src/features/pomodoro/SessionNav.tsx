@@ -1,13 +1,8 @@
 import { MODES } from "@/data/shared";
-import type { ModeKey } from "@/types/shared";
+import usePomodoro from "@/hooks/usePomodoro";
 
-export default function SessionNav({
-  mode,
-  onClick,
-}: {
-  mode: ModeKey;
-  onClick: (key: ModeKey) => void;
-}) {
+export default function SessionNav() {
+  const { mode, handleSelectMode } = usePomodoro();
   return (
     <nav className="flex justify-center gap-5 mb-5">
       {MODES.map((m) => (
@@ -19,7 +14,7 @@ export default function SessionNav({
             borderBottom:
               mode === m.key ? `3px solid ${m.color}` : "3px solid transparent",
           }}
-          onClick={() => onClick(m.key)}
+          onClick={() => handleSelectMode(m.key)}
         >
           {m.label}
         </button>

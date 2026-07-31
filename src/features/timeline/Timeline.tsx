@@ -1,16 +1,47 @@
-import { useState } from "react";
-import { MODES, HOUR_HEIGHT } from "@/data/shared";
+import { useEffect, useRef, useState } from "react";
+import { MODES, HOUR_HEIGHT, MAX_ZOOM, MIN_ZOOM } from "@/data/shared";
 import { minutesSinceMidnight } from "../../utils/helper";
 import usePomodoro from "@/hooks/usePomodoro";
 import type { Session } from "@/types/shared";
 import Title from "@/components/common/Title";
 import Subtitle from "@/components/common/Subtitle";
+import Legends from "./Legends";
+import YellowLabel from "@/components/common/Label";
+import { usePinch } from "@use-gesture/react";
 
 export default function Timeline() {
   const [zoomScale, setZoomScale] = useState(1);
   const { sessions, activeSession, now, clearSessions } = usePomodoro();
 
   const currentHourHeight = HOUR_HEIGHT * zoomScale;
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!scrollRef.current) return;
+
+    const currentHour = now.getHours() + now.getMinutes() / 60;
+    const targetScrollTop = Math.max(
+      0,
+      (currentHour - 1.5) * currentHourHeight,
+    );
+
+    scrollRef.current.scrollTo({
+      top: targetScrollTop,
+      behavior: "smooth",
+    });
+  }, []);
+
+  usePinch(
+    ({ offset: [scale] }) => {
+      setZoomScale(scale);
+    },
+    {
+      scaleBounds: { min: MIN_ZOOM, max: MAX_ZOOM },
+      rubberband: true,
+      target: scrollRef,
+      eventOptions: { passive: false },
+    },
+  );
 
   function zoomIn() {
     setZoomScale((prev) => Math.min(prev + 0.25, 3));
@@ -71,37 +102,15 @@ export default function Timeline() {
             </div>
           </div>
 
-          <div
-            className="flex gap-3.5 mb-3 flex-wrap
-"
-          >
-            {MODES.map((mode) => (
-              <div
-                key={mode.key}
-                className="flex items-center gap-1.25 text-[11px] text-[#5a5850]
-"
-              >
-                <span
-                  className="w-2 h-2 rounded-full inline-block
-"
-                  style={{ backgroundColor: mode.color }}
-                />
-                {mode.label}
-              </div>
-            ))}
-          </div>
+          <Legends />
 
           {displaySessions.length === 0 && (
-            <div
-              className="inline-block text-[11px] text-[#9a7b2f] bg-[#faf1dc] rounded-md px-2 py-1 mb-3
-"
-            >
-              Contoh tampilan — belum ada sesi hari ini
-            </div>
+            <YellowLabel>Contoh tampilan — belum ada sesi hari ini</YellowLabel>
           )}
 
           <div
-            className="h-[calc(100vh-301px)] overflow-y-auto border border-[#ececE4] rounded-xl bg-[#fbfaf7] pt-6
+            ref={scrollRef}
+            className="h-[calc(100vh-301px)] overflow-y-auto border border-[#ececE4] rounded-xl bg-[#fbfaf7] pt-6 touch-none
 "
           >
             <div

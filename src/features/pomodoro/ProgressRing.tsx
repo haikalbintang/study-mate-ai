@@ -1,19 +1,16 @@
 import { CIRCUMFERENCE, CYCLES_BEFORE_LONG_BREAK, RADIUS } from "@/data/shared";
+import usePomodoro from "@/hooks/usePomodoro";
 import { formatTime } from "@/utils/helper";
 
-export default function ProgressRing({
-  activeColor,
-  isRunning,
-  secondsLeft,
-  progress,
-  completedFocusSessions,
-}: {
-  activeColor: string;
-  isRunning: boolean;
-  secondsLeft: number;
-  progress: number;
-  completedFocusSessions: number;
-}) {
+export default function ProgressRing() {
+  const {
+    activeColor,
+    isRunning,
+    secondsLeft,
+    progress,
+    completedFocusSessions,
+  } = usePomodoro();
+
   const dashOffset = CIRCUMFERENCE * (1 - progress);
   const currentDot = completedFocusSessions % CYCLES_BEFORE_LONG_BREAK;
 

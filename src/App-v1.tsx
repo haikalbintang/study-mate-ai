@@ -11,7 +11,10 @@ function App() {
   const [activeView, setActiveView] = useState<ViewKey>("timer");
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      className="flex flex-col h-screen overflow-hidden"
+    >
       <main className="flex-1 overflow-y-auto pb-17">
         {activeView === "dashboard" && <Dashboard />}
         {activeView === "timer" && <Timer />}

@@ -1,11 +1,11 @@
-export default function Summary({
-  completedFocusSessions,
-}: {
-  completedFocusSessions: number;
-}) {
+import SubtitleSmall from "@/components/common/SubtitleSmall";
+import usePomodoro from "@/hooks/usePomodoro";
+
+export default function Summary() {
+  const { completedFocusSessions } = usePomodoro();
   return (
-    <div className="text-sm text-[#9a988f]">
+    <SubtitleSmall>
       Focus sessions completed today: <strong>{completedFocusSessions}</strong>
-    </div>
+    </SubtitleSmall>
   );
 }
