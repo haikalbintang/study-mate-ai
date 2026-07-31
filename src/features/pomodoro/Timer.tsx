@@ -26,7 +26,12 @@ export default function Timer() {
     MODES[1].minutes,
     MODES[2].minutes,
   ]);
-  const [secondsLeft, setSecondsLeft] = useState(durations[mode] * 60);
+  const [secondsLeftByMode, setSecondsLeftByMode] = useState([
+    durations[0] * 60,
+    durations[1] * 60,
+    durations[2] * 60,
+  ]);
+  // const [secondsLeft, setSecondsLeft] = useState(durations[mode] * 60);
   const [inputValues, setInputValues] = useState<string[]>([
     String(MODES[0].minutes),
     String(MODES[1].minutes),
@@ -37,6 +42,7 @@ export default function Timer() {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const totalSeconds = durations[mode] * 60;
+  const secondsLeft = secondsLeftByMode[mode];
   const isFinished = secondsLeft <= 0;
   const activeColor = MODES[mode].color;
 
@@ -51,14 +57,19 @@ export default function Timer() {
   useEffect(() => {
     if (!isRunning) return;
 
+    const currentMode = mode;
     intervalRef.current = setInterval(() => {
-      setSecondsLeft((prev) => Math.max(prev - 20, 0));
+      setSecondsLeftByMode((prev) => {
+        const next = [...prev];
+        next[currentMode] = Math.max(next[currentMode] - 1, 0);
+        return next;
+      });
     }, 1000);
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isRunning]);
+  }, [isRunning, mode]);
 
   useEffect(() => {
     function finishFocusSession() {
@@ -95,18 +106,27 @@ export default function Timer() {
     setMode(key);
     setIsRunning(false);
 
-    const newTotalSeconds = durations[key] * 60;
-    setSecondsLeft(newTotalSeconds);
+    // const newTotalSeconds = durations[key] * 60;
+    // setSecondsLeft(newTotalSeconds);
   }
 
   function handleReset() {
     setIsRunning(false);
-    setSecondsLeft(durations[mode] * 60);
+    setSecondsLeftByMode((prev) => {
+      const next = [...prev];
+      next[mode] = durations[mode] * 60;
+      return next;
+    });
   }
+
   function handlePauseStart() {
     if (isFinished) {
       setMode(nextMode);
-      setSecondsLeft(durations[nextMode] * 60);
+      setSecondsLeftByMode((prev) => {
+        const next = [...prev];
+        next[nextMode] = durations[nextMode] * 60;
+        return next;
+      });
       setIsRunning(true);
     } else {
       setIsRunning((r) => !r);
@@ -128,17 +148,32 @@ export default function Timer() {
 
   function handleDurationBlur(key: ModeKey, value: string) {
     const clamped = clampDuration(value);
+
     setInputValues((prev) => {
       const nextArray = [...prev];
       nextArray[key] = String(clamped);
       return nextArray;
     });
+
     setDurations((prev) => {
       const nextArray = [...prev];
       nextArray[key] = clamped;
       return nextArray;
     });
-    if (mode === key) setSecondsLeft(clamped * 60);
+
+    setSecondsLeftByMode((prev) => {
+      // If this is the tab you're currently on, reflect the new duration
+      // immediately. If it's a different tab, only overwrite its countdown
+      // when that tab hasn't been started yet (still sitting at its old full
+      // duration) — otherwise you'd erase progress on a paused session.
+      const previousFullDuration = durations[key] * 60;
+      const isUntouched = prev[key] === previousFullDuration;
+      if (key !== mode && !isUntouched) return prev;
+
+      const next = [...prev];
+      next[key] = clamped * 60;
+      return next;
+    });
   }
 
   return (
