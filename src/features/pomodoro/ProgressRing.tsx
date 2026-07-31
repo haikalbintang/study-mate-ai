@@ -16,6 +16,8 @@ export default function ProgressRing({
 }) {
   const dashOffset = CIRCUMFERENCE * (1 - progress);
   const currentDot = completedFocusSessions % CYCLES_BEFORE_LONG_BREAK;
+
+  const shouldAnimate = isRunning && progress > 0;
   return (
     <div className="relative flex items-center justify-center mx-auto mb-6 w-64 h-64">
       <svg width="280" height="280" viewBox="0 0 280 280">
@@ -39,7 +41,7 @@ export default function ProgressRing({
           strokeDashoffset={dashOffset}
           transform="rotate(-90 140 140)"
           style={{
-            transition: isRunning ? "stroke-dashoffset 1s linear" : "",
+            transition: shouldAnimate ? "stroke-dashoffset 1s linear" : "",
           }}
         />
       </svg>

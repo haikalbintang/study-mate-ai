@@ -83,12 +83,6 @@ export default function Timer() {
     }
   }, [isFinished, isRunning, mode]);
 
-  // useEffect(() => {
-  //   if (!isFinished) {
-  //     setSecondsLeft(durations[mode] * 60);
-  //   }
-  // }, [mode, durations, isFinished]);
-
   useEffect(() => {
     if (isRunning) {
       document.title = "Pomodoro";
