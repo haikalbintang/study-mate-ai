@@ -22,8 +22,8 @@ export default defineConfig({
         name: "StudyMate - Pomodoro Timer",
         short_name: "StudyMate",
         description: "A focused Pomodoro timer for studying",
-        theme_color: "#ffffff",
-        background_color: "#ffffff",
+        theme_color: "#f6f4ee",
+        background_color: "#f6f4ee",
         display: "standalone",
         start_url: "/",
 
