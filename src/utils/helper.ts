@@ -116,8 +116,8 @@ export async function playChime(): Promise<void> {
   await Promise.allSettled([sendNotification(), playChimeSound()]);
 }
 
-export function minutesSinceMidnight(dateInput: Date): number {
-  const d = new Date(dateInput);
+export function minutesSinceMidnight(ms: number): number {
+  const d = new Date(ms);
 
   // Guard against invalid date parameters
   if (isNaN(d.getTime())) return 0;
@@ -129,75 +129,6 @@ export function atTodayTime(hour: number, minute: number): number {
   const d = new Date();
   d.setHours(hour, minute, 0, 0);
   return d.getTime();
-}
-
-export function buildSampleSession() {
-  return [
-    {
-      id: "sample-1",
-      modeKey: 0,
-      mode: "focus",
-      start: atTodayTime(9, 0),
-      end: atTodayTime(9, 25),
-      completed: true,
-    },
-    {
-      id: "sample-2",
-      modeKey: 1,
-      mode: "short",
-      start: atTodayTime(9, 25),
-      end: atTodayTime(9, 30),
-      completed: true,
-    },
-    {
-      id: "sample-3",
-      modeKey: 0,
-      mode: "focus",
-      start: atTodayTime(9, 30),
-      end: atTodayTime(9, 55),
-      completed: true,
-    },
-    {
-      id: "sample-4",
-      modeKey: 1,
-      mode: "short",
-      start: atTodayTime(9, 55),
-      end: atTodayTime(10, 0),
-      completed: true,
-    },
-    {
-      id: "sample-5",
-      modeKey: 0,
-      mode: "focus",
-      start: atTodayTime(13, 15),
-      end: atTodayTime(13, 40),
-      completed: true,
-    },
-    {
-      id: "sample-6",
-      modeKey: 2,
-      mode: "long",
-      start: atTodayTime(13, 40),
-      end: atTodayTime(13, 55),
-      completed: true,
-    },
-    {
-      id: "sample-7",
-      modeKey: 0,
-      mode: "focus",
-      start: atTodayTime(16, 5),
-      end: atTodayTime(16, 22),
-      completed: false,
-    },
-    {
-      id: "sample-8",
-      modeKey: 0,
-      mode: "focus",
-      start: atTodayTime(4, 0),
-      end: atTodayTime(7, 0),
-      completed: false,
-    },
-  ];
 }
 
 export async function requestNotificationPermission() {

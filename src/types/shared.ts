@@ -26,8 +26,8 @@ export interface Session {
   id: string;
   modeKey: ModeKey;
   mode: SessionKind;
-  start: Date;
-  end: Date;
+  start: number;
+  end: number;
   completed: boolean;
 }
 
@@ -35,6 +35,15 @@ export interface ActiveSession {
   modeKey: ModeKey;
   mode: SessionKind;
   start: Date;
+}
+
+export interface LiveSession {
+  id: string;
+  modeKey: ModeKey;
+  mode: SessionKind;
+  start: Date;
+  end: Date;
+  completed: boolean;
 }
 
 export interface PomodoroContextValue {

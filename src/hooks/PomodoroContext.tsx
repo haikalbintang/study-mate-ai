@@ -18,6 +18,8 @@ import {
   playChime,
   requestNotificationPermission,
 } from "@/utils/helper";
+import { db } from "@/db/db";
+import { useLiveQuery } from "dexie-react-hooks";
 
 const MODE_NAME: Record<ModeKey, SessionKind> = {
   0: "focus",
@@ -46,10 +48,21 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     String(MODES[2].minutes),
   ]);
   const [completedFocusSessions, setCompletedFocusSessions] = useState(0);
-  const [sessions, setSessions] = useState<Session[]>([]);
+
+  const sessionFromDb = useLiveQuery(
+    () => db.sessions.orderBy("start").toArray(),
+    [],
+  );
+  const sessions: Session[] = sessionFromDb ?? [];
+
   const [activeSession, setActiveSession] = useState<ActiveSession | null>(
     null,
   );
+  const activeSessionRef = useRef<ActiveSession | null>(null);
+  useEffect(() => {
+    activeSessionRef.current = activeSession;
+  }, [activeSession]);
+
   const [now, setNow] = useState(() => new Date());
 
   const totalSeconds = durations[mode] * 60;
@@ -96,6 +109,7 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
 
   const pauseSession = useCallback(() => {
     stopTicking();
+    // Add setSessions
   }, []);
 
   const resumeSession = useCallback(() => {
@@ -104,23 +118,21 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const finishSession = useCallback(() => {
+    const current = activeSessionRef.current;
     const end = new Date();
-    setActiveSession((current) => {
-      if (current) {
-        setSessions((prev) => [
-          ...prev,
-          {
-            id: `${current.start.getTime()}`,
-            modeKey: current.modeKey,
-            mode: current.mode,
-            start: current.start,
-            end,
-            completed: true,
-          },
-        ]);
-      }
-      return null;
-    });
+
+    if (current) {
+      db.sessions.add({
+        id: `${current.start.getTime()}`,
+        modeKey: current.modeKey,
+        mode: current.mode,
+        start: current.start.getTime(),
+        end: end.getTime(),
+        completed: true,
+      });
+    }
+
+    setActiveSession(null);
     stopTicking();
   }, []);
 
@@ -129,7 +141,9 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     stopTicking();
   }, []);
 
-  const clearSessions = useCallback(() => setSessions([]), []);
+  const clearSessions = useCallback(() => {
+    db.sessions.clear();
+  }, []);
 
   useEffect(() => {
     if (!isRunning) return;

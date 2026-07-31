@@ -57,8 +57,8 @@ export default function Timeline() {
         id: "live",
         modeKey: activeSession.modeKey,
         mode: activeSession.mode,
-        start: activeSession.start,
-        end: now,
+        start: activeSession.start.getTime(),
+        end: now.getTime(),
         completed: false,
       }
     : null;
