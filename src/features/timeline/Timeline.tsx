@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { MODES, HOUR_HEIGHT } from "@/data/shared";
 import { buildSampleSession, minutesSinceMidnight } from "../../utils/helper";
+import usePomodoro from "@/hooks/usePomodoro";
+import type { Session } from "@/types/shared";
 
 export default function Timeline() {
   const [zoomScale, setZoomScale] = useState(1);
+  const { sessions, activeSession, now, clearSessions } = usePomodoro();
 
   const currentHourHeight = HOUR_HEIGHT * zoomScale;
 
@@ -14,6 +17,21 @@ export default function Timeline() {
   function zoomOut() {
     setZoomScale((prev) => Math.max(prev - 0.25, 0.5));
   }
+
+  const liveSession: Session | null = activeSession
+    ? {
+        id: "live",
+        modeKey: activeSession.modeKey,
+        mode: activeSession.mode,
+        start: activeSession.start,
+        end: now,
+        completed: false,
+      }
+    : null;
+
+  const displaySessions: Session[] = liveSession
+    ? [...sessions, liveSession]
+    : sessions;
 
   return (
     <div className="min-h-full w-full flex items-start md:items-center justify-center bg-[#f6f4ee] font-sans p-6 box-border">
@@ -52,8 +70,11 @@ export default function Timeline() {
               >
                 +
               </button>
-              <button className="bg-none border-none text-[#9a988f] text-xs cursor-pointer p-0 ml-2">
-                Bersihkan
+              <button
+                onClick={clearSessions}
+                className="bg-none border-none text-[#9a988f] text-xs cursor-pointer p-0 ml-2"
+              >
+                Clear
               </button>
             </div>
           </div>
@@ -78,12 +99,14 @@ export default function Timeline() {
             ))}
           </div>
 
-          <div
-            className="inline-block text-[11px] text-[#9a7b2f] bg-[#faf1dc] rounded-md px-2 py-1 mb-3
+          {displaySessions.length === 0 && (
+            <div
+              className="inline-block text-[11px] text-[#9a7b2f] bg-[#faf1dc] rounded-md px-2 py-1 mb-3
 "
-          >
-            Contoh tampilan — belum ada sesi hari ini
-          </div>
+            >
+              Contoh tampilan — belum ada sesi hari ini
+            </div>
+          )}
 
           <div
             className="h-[calc(100vh-301px)] overflow-y-auto border border-[#ececE4] rounded-xl bg-[#fbfaf7] pt-6
@@ -115,7 +138,7 @@ export default function Timeline() {
                 </div>
               ))}
 
-              {buildSampleSession().map((session) => {
+              {displaySessions.map((session) => {
                 const startMin = minutesSinceMidnight(session.start);
                 const endMinRaw = minutesSinceMidnight(session.end);
                 const endMin = endMinRaw <= startMin ? 1440 : endMinRaw;
@@ -134,12 +157,11 @@ export default function Timeline() {
                       height: `${height}px`,
                       background: `${MODES[session.modeKey].color}cc`,
                       borderLeft: `5px solid ${MODES[session.modeKey].color}`,
+                      transition: session.completed
+                        ? undefined
+                        : "height 1s linear",
                     }}
-                  >
-                    <span className="text-[11px] text-[#fbfaf7]">
-                      {session.mode === "focus" ? "" : ""}
-                    </span>
-                  </div>
+                  />
                 );
               })}
             </div>

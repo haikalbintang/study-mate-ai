@@ -19,3 +19,32 @@ export interface SessionRecord {
 }
 
 export type DurationsState = Record<ModeKey, number | "">;
+
+export type SessionKind = "focus" | "shortBreak" | "longBreak";
+
+export interface Session {
+  id: string;
+  modeKey: ModeKey;
+  mode: SessionKind;
+  start: Date;
+  end: Date;
+  completed: boolean;
+}
+
+export interface ActiveSession {
+  modeKey: ModeKey;
+  mode: SessionKind;
+  start: Date;
+}
+
+export interface PomodoroContextValue {
+  sessions: Session[];
+  activeSession: ActiveSession | null;
+  now: Date;
+  startSession: (modeKey: ModeKey) => void;
+  pauseSession: () => void;
+  resumeSession: () => void;
+  finishSession: () => void;
+  cancelSession: () => void;
+  clearSessions: () => void;
+}

@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-import { CYCLES_BEFORE_LONG_BREAK, MODES } from "@/data/shared";
+import { CYCLES_BEFORE_LONG_BREAK, MODES, PACE } from "@/data/shared";
 import {
   clampDuration,
   playChime,
@@ -16,8 +16,16 @@ import ButtonsShell from "@/components/common/ButtonsShell";
 import SessionNav from "./SessionNav";
 import Card from "@/components/common/Card";
 import Background from "@/components/common/Background";
+import usePomodoro from "@/hooks/usePomodoro";
 
 export default function Timer() {
+  const {
+    startSession,
+    pauseSession,
+    resumeSession,
+    finishSession,
+    cancelSession,
+  } = usePomodoro();
   const [mode, setMode] = useState<ModeKey>(0);
   const [isRunning, setIsRunning] = useState(false);
   const [showSettings, setShowSettings] = useState(true);
@@ -61,7 +69,7 @@ export default function Timer() {
     intervalRef.current = setInterval(() => {
       setSecondsLeftByMode((prev) => {
         const next = [...prev];
-        next[currentMode] = Math.max(next[currentMode] - 1, 0);
+        next[currentMode] = Math.max(next[currentMode] - PACE, 0);
         return next;
       });
     }, 1000);
@@ -77,12 +85,14 @@ export default function Timer() {
       document.title = "Time's Up! — Pomodoro";
       setIsRunning(false);
       setCompletedFocusSessions((prev) => prev + 1);
+      finishSession();
     }
 
     function finishBreakSession() {
       playChime();
       document.title = "Time's Up! — Pomodoro";
       setIsRunning(false);
+      finishSession();
     }
 
     if (isFinished && isRunning) {
@@ -92,7 +102,7 @@ export default function Timer() {
         finishBreakSession();
       }
     }
-  }, [isFinished, isRunning, mode]);
+  }, [isFinished, isRunning, mode, finishSession]);
 
   useEffect(() => {
     if (isRunning) {
@@ -103,6 +113,7 @@ export default function Timer() {
   const progress = 1 - secondsLeft / totalSeconds;
 
   function handleSelectMode(key: ModeKey) {
+    if (isRunning) pauseSession();
     setMode(key);
     setIsRunning(false);
 
@@ -112,6 +123,7 @@ export default function Timer() {
 
   function handleReset() {
     setIsRunning(false);
+    cancelSession();
     setSecondsLeftByMode((prev) => {
       const next = [...prev];
       next[mode] = durations[mode] * 60;
@@ -128,9 +140,23 @@ export default function Timer() {
         return next;
       });
       setIsRunning(true);
+      startSession(nextMode);
+      return;
+    }
+
+    if (isRunning) {
+      setIsRunning(false);
+      pauseSession();
+      return;
+    }
+
+    setIsRunning(true);
+    requestNotificationPermission();
+
+    if (secondsLeft === totalSeconds) {
+      startSession(mode);
     } else {
-      setIsRunning((r) => !r);
-      requestNotificationPermission();
+      resumeSession();
     }
   }
   function handleToggleSettings() {

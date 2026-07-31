@@ -116,8 +116,12 @@ export async function playChime(): Promise<void> {
   await Promise.allSettled([sendNotification(), playChimeSound()]);
 }
 
-export function minutesSinceMidnight(ms: number): number {
-  const d = new Date(ms);
+export function minutesSinceMidnight(dateInput: Date): number {
+  const d = new Date(dateInput);
+
+  // Guard against invalid date parameters
+  if (isNaN(d.getTime())) return 0;
+
   return d.getHours() * 60 + d.getMinutes() + d.getSeconds() / 60;
 }
 
