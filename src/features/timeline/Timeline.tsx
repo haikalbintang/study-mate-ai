@@ -40,6 +40,7 @@ export default function Timeline() {
       rubberband: true,
       target: scrollRef,
       eventOptions: { passive: false },
+      preventDefault: true,
     },
   );
 
@@ -110,7 +111,7 @@ export default function Timeline() {
 
           <div
             ref={scrollRef}
-            className="h-[calc(100vh-301px)] overflow-y-auto border border-[#ececE4] rounded-xl bg-[#fbfaf7] pt-6 touch-none
+            className="h-[calc(100vh-301px)] overflow-y-auto border border-[#ececE4] rounded-xl bg-[#fbfaf7] pt-6 touch-pan-y
 "
           >
             <div
