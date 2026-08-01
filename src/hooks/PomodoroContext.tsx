@@ -27,6 +27,32 @@ const MODE_NAME: Record<ModeKey, SessionKind> = {
   2: "longBreak",
 };
 
+interface AppSettings {
+  dailyGoal: number;
+  cyclesBeforeLongBreak: number;
+  autoStartNext: boolean;
+  soundEnabled: boolean;
+}
+
+const SETTINGS_STORAGE_KEY = "pomodoro-settings";
+
+const DEFAULT_SETTINGS: AppSettings = {
+  dailyGoal: 4,
+  cyclesBeforeLongBreak: 4,
+  autoStartNext: false,
+  soundEnabled: true,
+};
+
+function loadSettings(): AppSettings {
+  try {
+    const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    if (!raw) return DEFAULT_SETTINGS;
+    return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+}
+
 export function PomodoroProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<ModeKey>(0);
   const [isRunning, setIsRunning] = useState(false);
@@ -48,6 +74,28 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     String(MODES[2].minutes),
   ]);
   const [completedFocusSessions, setCompletedFocusSessions] = useState(0);
+
+  const [settings, setSettings] = useState<AppSettings>(loadSettings);
+
+  useEffect(() => {
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+  }, [settings]);
+
+  const setDailyGoal = useCallback((value: number) => {
+    setSettings((prev) => ({ ...prev, dailyGoal: value }));
+  }, []);
+
+  const setCyclesBeforeLongBreak = useCallback((value: number) => {
+    setSettings((prev) => ({ ...prev, cyclesBeforeLongBreak: value }));
+  }, []);
+
+  const setAutoStartNext = useCallback((value: boolean) => {
+    setSettings((prev) => ({ ...prev, autoStartNext: value }));
+  }, []);
+
+  const setSoundEnabled = useCallback((value: boolean) => {
+    setSettings((prev) => ({ ...prev, soundEnabled: value }));
+  }, []);
 
   const sessionFromDb = useLiveQuery(
     () => db.sessions.orderBy("start").toArray(),
@@ -108,12 +156,28 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const pauseSession = useCallback(() => {
+    const current = activeSessionRef.current;
+    const end = new Date();
+
+    if (current) {
+      db.sessions.add({
+        id: `${current.start.getTime()}`,
+        modeKey: current.modeKey,
+        mode: current.mode,
+        start: current.start.getTime(),
+        end: end.getTime(),
+        completed: false,
+      });
+    }
+
+    setActiveSession(null);
     stopTicking();
-    // Add setSessions
   }, []);
 
-  const resumeSession = useCallback(() => {
-    setNow(new Date());
+  const resumeSession = useCallback((modeKey: ModeKey) => {
+    const start = new Date();
+    setActiveSession({ modeKey, mode: MODE_NAME[modeKey], start });
+    setNow(start);
     ensureTicking();
   }, []);
 
@@ -143,6 +207,11 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
 
   const clearSessions = useCallback(() => {
     db.sessions.clear();
+  }, []);
+
+  const clearAllData = useCallback(() => {
+    db.sessions.clear();
+    setCompletedFocusSessions(0);
   }, []);
 
   useEffect(() => {
@@ -228,7 +297,7 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     if (secondsLeft === totalSeconds) {
       startSession(mode);
     } else {
-      resumeSession();
+      resumeSession(mode);
     }
   }
   function handleToggleSettings() {
@@ -286,6 +355,16 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
         finishSession,
         cancelSession,
         clearSessions,
+        clearAllData,
+
+        dailyGoal: settings.dailyGoal,
+        cyclesBeforeLongBreak: settings.cyclesBeforeLongBreak,
+        autoStartNext: settings.autoStartNext,
+        soundEnabled: settings.soundEnabled,
+        setDailyGoal,
+        setCyclesBeforeLongBreak,
+        setAutoStartNext,
+        setSoundEnabled,
 
         mode,
         isRunning,

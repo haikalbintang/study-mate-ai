@@ -52,10 +52,20 @@ export interface PomodoroContextValue {
   now: Date;
   startSession: (modeKey: ModeKey) => void;
   pauseSession: () => void;
-  resumeSession: () => void;
+  resumeSession: (modeKey: ModeKey) => void;
   finishSession: () => void;
   cancelSession: () => void;
   clearSessions: () => void;
+  clearAllData: () => void;
+
+  dailyGoal: number;
+  cyclesBeforeLongBreak: number;
+  autoStartNext: boolean;
+  soundEnabled: boolean;
+  setDailyGoal: (value: number) => void;
+  setCyclesBeforeLongBreak: (value: number) => void;
+  setAutoStartNext: (value: boolean) => void;
+  setSoundEnabled: (value: boolean) => void;
 
   mode: ModeKey;
   isRunning: boolean;
