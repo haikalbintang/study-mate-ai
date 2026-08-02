@@ -211,10 +211,9 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   }
 
   function handleDurationChange(key: ModeKey, value: string) {
-    const clamped = clampDuration(value);
     setInputValues((prev) => {
       const nextArray = [...prev];
-      nextArray[key] = String(clamped);
+      nextArray[key] = value;
       return nextArray;
     });
   }
