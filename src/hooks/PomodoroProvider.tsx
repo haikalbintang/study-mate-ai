@@ -48,25 +48,19 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
 
   const cancelSession = endSession;
 
+  const { durations, setDurations } = settings;
+
   const [mode, setMode] = useState<ModeKey>(0);
   const [isRunning, setIsRunning] = useState(false);
   const [showSettings, setShowSettings] = useState(true);
-  const [durations, setDurations] = useState([
-    MODES[0].minutes,
-    MODES[1].minutes,
-    MODES[2].minutes,
-  ]);
-  const [secondsLeftByMode, setSecondsLeftByMode] = useState([
-    durations[0] * 60,
-    durations[1] * 60,
-    durations[2] * 60,
-  ]);
 
-  const [inputValues, setInputValues] = useState<string[]>([
-    String(MODES[0].minutes),
-    String(MODES[1].minutes),
-    String(MODES[2].minutes),
-  ]);
+  const [secondsLeftByMode, setSecondsLeftByMode] = useState(() =>
+    durations.map((d) => d * 60),
+  );
+
+  const [inputValues, setInputValues] = useState<string[]>(() =>
+    durations.map((d) => String(d)),
+  );
   const [completedFocusSessions, setCompletedFocusSessions] = useState(0);
 
   const clearSessions = useCallback(() => {

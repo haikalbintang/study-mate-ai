@@ -1,3 +1,4 @@
+import { MODES } from "@/data/shared";
 import { useCallback, useEffect, useState } from "react";
 
 export interface AppSettings {
@@ -5,6 +6,7 @@ export interface AppSettings {
   cyclesBeforeLongBreak: number;
   autoStartNext: boolean;
   soundEnabled: boolean;
+  durations: number[];
 }
 
 const SETTINGS_STORAGE_KEY = "pomodoro-settings";
@@ -14,6 +16,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   cyclesBeforeLongBreak: 4,
   autoStartNext: false,
   soundEnabled: true,
+  durations: [MODES[0].minutes, MODES[1].minutes, MODES[2].minutes],
 };
 
 function loadSettings(): AppSettings {
@@ -25,6 +28,8 @@ function loadSettings(): AppSettings {
     return DEFAULT_SETTINGS;
   }
 }
+
+type DurationsUpdater = number[] | ((prev: number[]) => number[]);
 
 export function useSettings() {
   const [settings, setSettings] = useState<AppSettings>(loadSettings);
@@ -52,15 +57,24 @@ export function useSettings() {
       setSettings((prev) => ({ ...prev, soundEnabled: value })),
     [],
   );
+  const setDurations = useCallback((updater: DurationsUpdater) => {
+    setSettings((prev) => ({
+      ...prev,
+      durations:
+        typeof updater === "function" ? updater(prev.durations) : updater,
+    }));
+  }, []);
 
   return {
     dailyGoal: settings.dailyGoal,
     cyclesBeforeLongBreak: settings.cyclesBeforeLongBreak,
     autoStartNext: settings.autoStartNext,
     soundEnabled: settings.soundEnabled,
+    durations: settings.durations,
     setDailyGoal,
     setCyclesBeforeLongBreak,
     setAutoStartNext,
     setSoundEnabled,
+    setDurations,
   };
 }
