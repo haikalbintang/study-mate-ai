@@ -7,32 +7,30 @@ import {
   type ReactNode,
 } from "react";
 import { PomodoroContext } from "./usePomodoro";
-import { CYCLES_BEFORE_LONG_BREAK, MODES, PACE } from "@/data/shared";
+import { MODES, PACE } from "@/data/shared";
 import {
   clampDuration,
   playChime,
   requestNotificationPermission,
 } from "@/utils/helper";
 import { db } from "@/db/db";
-import { logSession } from "./sessionLog-c1";
-import { useSettings } from "./useSettings-c1";
+import { useSettings } from "./useSettings";
+import { useTodayBoundary } from "./useTodayBoundary";
+
 import { useActiveSessionClock } from "./useActiveSessionClock";
-import { useSessionsFromDb } from "./useSessionsFromDb-c1";
-import { useTodayBoundary } from "./useTodayBoundary-c1";
-import { useDailyStats } from "./useDailyStats-c1";
+import { logSession } from "@/utils/logSession";
+import { useSessionsFromDb } from "./useSessionFromDb";
+import { useDailyStats } from "./useDailyStats";
+import { notifyCompletion } from "@/utils/notifyCompletion";
 
 export function PomodoroProvider({ children }: { children: ReactNode }) {
+  const settings = useSettings();
   const todayTimestamp = useTodayBoundary();
   const sessions = useSessionsFromDb();
-  const settings = useSettings();
 
   const { activeSession, activeSessionRef, now, beginSession, endSession } =
     useActiveSessionClock();
 
-  // startSession and resumeSession used to be two copies of the exact same
-  // body — both just "start the live clock from now". Kept as two names
-  // since call sites read more clearly that way, but there's only one
-  // implementation now.
   const startSession = beginSession;
   const resumeSession = beginSession;
 
@@ -50,15 +48,6 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
 
   const cancelSession = endSession;
 
-  const clearSessions = useCallback(() => {
-    db.sessions.clear();
-  }, []);
-
-  const clearAllData = useCallback(() => {
-    db.sessions.clear();
-    setCompletedFocusSessions(0);
-  }, []);
-
   const [mode, setMode] = useState<ModeKey>(0);
   const [isRunning, setIsRunning] = useState(false);
   const [showSettings, setShowSettings] = useState(true);
@@ -72,12 +61,22 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     durations[1] * 60,
     durations[2] * 60,
   ]);
+
   const [inputValues, setInputValues] = useState<string[]>([
     String(MODES[0].minutes),
     String(MODES[1].minutes),
     String(MODES[2].minutes),
   ]);
   const [completedFocusSessions, setCompletedFocusSessions] = useState(0);
+
+  const clearSessions = useCallback(() => {
+    db.sessions.clear();
+  }, []);
+
+  const clearAllData = useCallback(() => {
+    db.sessions.clear();
+    setCompletedFocusSessions(0);
+  }, []);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -88,7 +87,7 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
 
   const nextMode: ModeKey =
     mode === 0
-      ? completedFocusSessions % CYCLES_BEFORE_LONG_BREAK === 0
+      ? completedFocusSessions % settings.cyclesBeforeLongBreak === 0
         ? 2
         : 1
       : 0;
@@ -96,10 +95,11 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   const progress = 1 - secondsLeft / totalSeconds;
 
   useEffect(() => {
-    if (isRunning) document.title = "Pomodoro";
+    if (isRunning) {
+      document.title = "Pomodoro";
+    }
   }, [isRunning]);
 
-  // Countdown ticking for whichever mode is currently active.
   useEffect(() => {
     if (!isRunning) return;
 
@@ -117,18 +117,54 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     };
   }, [isRunning, mode]);
 
-  // Auto-transition once the active countdown hits zero. Focus and break
-  // sessions only differed by whether they increment the daily focus count,
-  // so that's now the one branch instead of two near-identical functions.
   useEffect(() => {
     if (!(isFinished && isRunning)) return;
 
-    playChime();
-    document.title = "Time's Up! — Pomodoro";
-    setIsRunning(false);
-    if (mode === 0) setCompletedFocusSessions((prev) => prev + 1);
-    finishSession();
-  }, [isFinished, isRunning, mode, finishSession]);
+    function handleTimerCompletion() {
+      if (settings.soundEnabled) playChime();
+      notifyCompletion(mode);
+      document.title = "Time's Up! — Pomodoro";
+      setIsRunning(false);
+      finishSession();
+      let updatedCompletedFocusSessions = completedFocusSessions;
+      if (mode === 0) {
+        updatedCompletedFocusSessions = completedFocusSessions + 1;
+        setCompletedFocusSessions(updatedCompletedFocusSessions);
+      }
+
+      if (settings.autoStartNext) {
+        const upcomingMode: ModeKey =
+          mode === 0
+            ? updatedCompletedFocusSessions % settings.cyclesBeforeLongBreak ===
+              0
+              ? 2
+              : 1
+            : 0;
+
+        setMode(upcomingMode);
+        setSecondsLeftByMode((prev) => {
+          const next = [...prev];
+          next[upcomingMode] = durations[upcomingMode] * 60;
+          return next;
+        });
+        setIsRunning(true);
+        startSession(upcomingMode);
+      }
+    }
+
+    handleTimerCompletion();
+  }, [
+    isFinished,
+    isRunning,
+    mode,
+    finishSession,
+    settings.soundEnabled,
+    settings.autoStartNext,
+    settings.cyclesBeforeLongBreak,
+    completedFocusSessions,
+    durations,
+    startSession,
+  ]);
 
   const stats = useDailyStats(sessions, todayTimestamp);
 
@@ -176,7 +212,6 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
       resumeSession(mode);
     }
   }
-
   function handleToggleSettings() {
     setShowSettings((s) => !s);
   }
@@ -184,9 +219,9 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   function handleDurationChange(key: ModeKey, value: string) {
     const clamped = clampDuration(value);
     setInputValues((prev) => {
-      const next = [...prev];
-      next[key] = String(clamped);
-      return next;
+      const nextArray = [...prev];
+      nextArray[key] = String(clamped);
+      return nextArray;
     });
   }
 
@@ -194,22 +229,18 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     const clamped = clampDuration(value);
 
     setInputValues((prev) => {
-      const next = [...prev];
-      next[key] = String(clamped);
-      return next;
+      const nextArray = [...prev];
+      nextArray[key] = String(clamped);
+      return nextArray;
     });
 
     setDurations((prev) => {
-      const next = [...prev];
-      next[key] = clamped;
-      return next;
+      const nextArray = [...prev];
+      nextArray[key] = clamped;
+      return nextArray;
     });
 
     setSecondsLeftByMode((prev) => {
-      // If this is the mode you're currently on, reflect the new duration
-      // immediately. If it's a different mode, only overwrite its countdown
-      // when that mode hasn't been started yet (still at its old full
-      // duration) — otherwise you'd erase progress on a paused session.
       const previousFullDuration = durations[key] * 60;
       const isUntouched = prev[key] === previousFullDuration;
       if (key !== mode && !isUntouched) return prev;
