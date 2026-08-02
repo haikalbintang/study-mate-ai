@@ -30,3 +30,6 @@ export const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 export const MIN_ZOOM = 0.5;
 export const MAX_ZOOM = 4;
+
+// TODO: move this into Settings once a "daily goal" input exists there.
+export const DAILY_GOAL_SESSIONS = 4;

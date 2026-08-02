@@ -1,4 +1,4 @@
-import { CIRCUMFERENCE, CYCLES_BEFORE_LONG_BREAK, RADIUS } from "@/data/shared";
+import { CIRCUMFERENCE, RADIUS } from "@/data/shared";
 import usePomodoro from "@/hooks/usePomodoro";
 import { formatTime } from "@/utils/helper";
 
@@ -9,10 +9,11 @@ export default function ProgressRing() {
     secondsLeft,
     progress,
     completedFocusSessions,
+    cyclesBeforeLongBreak,
   } = usePomodoro();
 
   const dashOffset = CIRCUMFERENCE * (1 - progress);
-  const currentDot = completedFocusSessions % CYCLES_BEFORE_LONG_BREAK;
+  const currentDot = completedFocusSessions % cyclesBeforeLongBreak;
 
   const shouldAnimate = isRunning && progress > 0;
   return (
@@ -48,7 +49,7 @@ export default function ProgressRing() {
         </div>
         <div className="mt-2 text-xl tracking-[3px] text-[#c9a25b]">
           {"●".repeat(currentDot)}
-          {"○".repeat(CYCLES_BEFORE_LONG_BREAK - currentDot)}
+          {"○".repeat(cyclesBeforeLongBreak - currentDot)}
         </div>
       </div>
     </div>

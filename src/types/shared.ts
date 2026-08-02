@@ -91,4 +91,22 @@ export interface PomodoroContextValue {
   secondsLeft: number;
   totalSeconds: number;
   isFinished: boolean;
+
+  stats: {
+    todaySessions: Session[];
+    completedToday: number;
+    focusMinutesToday: number;
+    completionRate: number | null;
+    distribution: {
+      key: ModeKey;
+      label: string;
+      color: string;
+      minutes: number;
+    }[];
+    maxDistributionMinutes: number;
+    streak: number;
+    bestHour: number | null;
+    vsYesterdayPct: number | null;
+    sessionsToGoal: number;
+  };
 }

@@ -1,39 +1,14 @@
 import { useState } from "react";
 import Title from "@/components/common/Title";
-import { MODES } from "@/data/shared";
 import usePomodoro from "@/hooks/usePomodoro";
-import type { ModeKey } from "@/types/shared";
-
-function Toggle({
-  checked,
-  onChange,
-}: {
-  checked: boolean;
-  onChange: (value: boolean) => void;
-}) {
-  return (
-    <button
-      role="switch"
-      aria-checked={checked}
-      onClick={() => onChange(!checked)}
-      className="w-10 h-6 rounded-full relative shrink-0 transition-colors duration-200 border-none cursor-pointer"
-      style={{ backgroundColor: checked ? "#c25b3a" : "#e4e1d7" }}
-    >
-      <span
-        className="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200"
-        style={{
-          transform: checked ? "translateX(-18px)" : "translateX(-2px)",
-        }}
-      />
-    </button>
-  );
-}
+import Background from "@/components/common/Background";
+import Card from "@/components/common/Card";
+import SectionTitle from "../dashboard/SectionTitle";
+import Toggle from "./Toggle";
+import Durations from "./Durations";
 
 export default function Settings() {
   const {
-    inputValues,
-    handleDurationChange,
-    handleDurationBlur,
     dailyGoal,
     setDailyGoal,
     cyclesBeforeLongBreak,
@@ -71,44 +46,15 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-full w-full flex items-start md:items-center justify-center bg-[#f6f4ee] font-sans p-6 box-border">
-      <div className="bg-white rounded-3xl pt-8 px-9 pb-7 w-90 max-w-full shadow-lg border border-[#ececE4]">
+    <Background>
+      <Card>
         <Title>Settings</Title>
 
-        {/* Durations */}
-        <div className="text-left text-xs font-semibold text-[#9a988f] uppercase tracking-[0.4px] mt-6 mb-3">
-          Durations (minute)
-        </div>
-        <div className="flex flex-col gap-3.5">
-          {MODES.map((m) => (
-            <label
-              key={m.key}
-              className="flex items-center justify-between text-sm"
-            >
-              <span style={{ color: m.color }} className="font-medium">
-                {m.label}
-              </span>
-              <input
-                type="number"
-                min={1}
-                max={120}
-                value={inputValues[m.key]}
-                onChange={(e) =>
-                  handleDurationChange(m.key as ModeKey, e.target.value)
-                }
-                onBlur={(e) =>
-                  handleDurationBlur(m.key as ModeKey, e.target.value)
-                }
-                className="w-14 px-2 py-1 rounded-md border border-[#d8d6cd] text-sm text-center"
-              />
-            </label>
-          ))}
-        </div>
+        <SectionTitle>Durations (minute)</SectionTitle>
+        <Durations />
 
         {/* Cycle & goal */}
-        <div className="text-left text-xs font-semibold text-[#9a988f] uppercase tracking-[0.4px] mt-6 mb-3">
-          Cycle &amp; Goal
-        </div>
+        <SectionTitle>Cycle & Goal</SectionTitle>
         <div className="flex flex-col gap-3.5">
           <label className="flex items-center justify-between text-sm">
             <span className="text-[#2b2a26]">Session before long break</span>
@@ -137,9 +83,7 @@ export default function Settings() {
         </div>
 
         {/* Behavior */}
-        <div className="text-left text-xs font-semibold text-[#9a988f] uppercase tracking-[0.4px] mt-6 mb-3">
-          Behavior
-        </div>
+        <SectionTitle>Behavior</SectionTitle>
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between text-sm">
             <div>
@@ -176,7 +120,7 @@ export default function Settings() {
             {confirmingReset ? "Are you sure?" : "Delete all data"}
           </button>
         </div>
-      </div>
-    </div>
+      </Card>
+    </Background>
   );
 }

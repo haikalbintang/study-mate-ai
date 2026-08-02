@@ -7,12 +7,13 @@ import type {
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
 } from "react";
 import { PomodoroContext } from "./usePomodoro";
-import { CYCLES_BEFORE_LONG_BREAK, MODES, PACE } from "@/data/shared";
+import { DAILY_GOAL_SESSIONS, MODES, PACE } from "@/data/shared";
 import {
   clampDuration,
   playChime,
@@ -20,6 +21,7 @@ import {
 } from "@/utils/helper";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
+import { addDays, dayKey, isSameDay, minutesOf } from "@/utils/date-helper";
 
 const MODE_NAME: Record<ModeKey, SessionKind> = {
   0: "focus",
@@ -54,6 +56,11 @@ function loadSettings(): AppSettings {
 }
 
 export function PomodoroProvider({ children }: { children: ReactNode }) {
+  const [todayTimestamp, setTodayTimestamp] = useState(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d.getTime();
+  });
   const [mode, setMode] = useState<ModeKey>(0);
   const [isRunning, setIsRunning] = useState(false);
   const [showSettings, setShowSettings] = useState(true);
@@ -101,7 +108,19 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     () => db.sessions.orderBy("start").toArray(),
     [],
   );
+
   const sessions: Session[] = sessionFromDb ?? [];
+
+  useEffect(() => {
+    const checkMidnight = setInterval(() => {
+      const currentStartOfDay = new Date().setHours(0, 0, 0, 0);
+      if (currentStartOfDay !== todayTimestamp) {
+        setTodayTimestamp(currentStartOfDay);
+      }
+    }, 60000); // Check once per minute, not every second
+
+    return () => clearInterval(checkMidnight);
+  }, [todayTimestamp]);
 
   const [activeSession, setActiveSession] = useState<ActiveSession | null>(
     null,
@@ -120,7 +139,7 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
 
   const nextMode: ModeKey =
     mode === 0
-      ? completedFocusSessions % CYCLES_BEFORE_LONG_BREAK === 0
+      ? completedFocusSessions % settings.cyclesBeforeLongBreak === 0
         ? 2
         : 1
       : 0;
@@ -256,6 +275,92 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     }
   }, [isFinished, isRunning, mode, finishSession]);
 
+  const stats = useMemo(() => {
+    // const now = Date.now();
+    const today = new Date(todayTimestamp);
+
+    const todaySessions = sessions.filter((s) =>
+      isSameDay(s.start, todayTimestamp),
+    );
+    const yesterdaySessions = sessions.filter((s) =>
+      isSameDay(s.start, addDays(today, -1).getTime()),
+    );
+
+    const todayFocus = todaySessions.filter((s) => s.modeKey === 0);
+    const yesterdayFocus = yesterdaySessions.filter((s) => s.modeKey === 0);
+
+    const completedToday = todayFocus.filter((s) => s.completed).length;
+    const focusMinutesToday = minutesOf(todayFocus);
+    const focusMinutesYesterday = minutesOf(yesterdayFocus);
+
+    const completionRate =
+      todayFocus.length === 0
+        ? null
+        : Math.round((completedToday / todayFocus.length) * 100);
+
+    // Minutes per mode, today — for the "time distribution" bars.
+    const distribution = MODES.map((m) => ({
+      ...m,
+      minutes: minutesOf(todaySessions.filter((s) => s.modeKey === m.key)),
+    }));
+    const maxDistributionMinutes = Math.max(
+      ...distribution.map((d) => d.minutes),
+      1,
+    );
+
+    // Streak: consecutive days (including today) with >= 1 completed focus session.
+    const completedFocusDayKeys = new Set(
+      sessions
+        .filter((s) => s.modeKey === 0 && s.completed)
+        .map((s) => dayKey(s.start)),
+    );
+    let streak = 8;
+    let cursor = today;
+    while (completedFocusDayKeys.has(dayKey(cursor.getTime()))) {
+      streak += 1;
+      cursor = addDays(cursor, -1);
+    }
+
+    // Best hour: across all completed focus sessions ever logged, which
+    // hour-of-day has accumulated the most focus minutes.
+    const minutesByHour = new Array(24).fill(0) as number[];
+    sessions
+      .filter((s) => s.modeKey === 0 && s.completed)
+      .forEach((s) => {
+        const hour = new Date(s.start).getHours();
+        minutesByHour[hour] += (s.end - s.start) / 60000;
+      });
+    const totalHistoricalMinutes = minutesByHour.reduce((a, b) => a + b, 0);
+    const bestHour =
+      totalHistoricalMinutes === 0
+        ? null
+        : minutesByHour.indexOf(Math.max(...minutesByHour));
+
+    const vsYesterdayPct =
+      focusMinutesYesterday === 0
+        ? null
+        : Math.round(
+            ((focusMinutesToday - focusMinutesYesterday) /
+              focusMinutesYesterday) *
+              100,
+          );
+
+    const sessionsToGoal = Math.max(0, settings.dailyGoal - completedToday);
+
+    return {
+      todaySessions: [...todaySessions].sort((a, b) => a.start - b.start),
+      completedToday,
+      focusMinutesToday,
+      completionRate,
+      distribution,
+      maxDistributionMinutes,
+      streak,
+      bestHour,
+      vsYesterdayPct,
+      sessionsToGoal,
+    };
+  }, [sessions, todayTimestamp]);
+
   function handleSelectMode(key: ModeKey) {
     if (isRunning) pauseSession();
     setMode(key);
@@ -390,6 +495,8 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
         secondsLeft,
         totalSeconds,
         isFinished,
+
+        stats,
       }}
     >
       {children}

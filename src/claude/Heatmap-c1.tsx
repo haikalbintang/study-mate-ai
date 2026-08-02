@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { Session } from "@/types/shared";
+import usePomodoro from "@/hooks/usePomodoro";
 
 interface DayCell {
   key: string;
@@ -99,9 +100,10 @@ function buildWeeks(focusSessions: Session[]): DayCell[][] {
   return weeks;
 }
 
-export default function Heatmap({ sessions }: { sessions: Session[] }) {
+export default function Heatmap() {
+  const { sessions } = usePomodoro();
   const focusSessions = useMemo(
-    () => sessions.filter((s) => s.modeKey === 0 && s.completed),
+    () => sessions.filter((s) => s.modeKey === 0),
     [sessions],
   );
   const weeks = useMemo(() => buildWeeks(focusSessions), [focusSessions]);
@@ -186,14 +188,14 @@ export default function Heatmap({ sessions }: { sessions: Session[] }) {
 
       <div className="flex items-center justify-between mt-2 text-[10px] text-[#9a988f]">
         <span>
-          {activeDays} hari aktif dalam {WEEKS_TO_SHOW} minggu terakhir
+          {activeDays} active days in the last {WEEKS_TO_SHOW} weeks
         </span>
         <div className="flex items-center gap-1">
           <span>Less</span>
           {[0, 20, 40, 75, 120].map((m) => (
             <span
               key={m}
-              className="rounded-[2px]"
+              className="rounded-xs"
               style={{
                 width: "9px",
                 height: "9px",

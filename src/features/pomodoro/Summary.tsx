@@ -4,8 +4,11 @@ import usePomodoro from "@/hooks/usePomodoro";
 export default function Summary() {
   const { completedFocusSessions } = usePomodoro();
   return (
-    <SubtitleSmall>
-      Focus sessions completed today: <strong>{completedFocusSessions}</strong>
-    </SubtitleSmall>
+    <span className="text-center">
+      <SubtitleSmall>
+        Focus sessions completed today:{" "}
+        <strong>{completedFocusSessions}</strong>
+      </SubtitleSmall>
+    </span>
   );
 }
