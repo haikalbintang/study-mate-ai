@@ -13,7 +13,7 @@ import Card from "@/components/common/Card";
 
 export default function Timeline() {
   const [zoomScale, setZoomScale] = useState(1);
-  const { sessions, activeSession, now, clearSessions } = usePomodoro();
+  const { stats, activeSession, now, clearSessions } = usePomodoro();
 
   const currentHourHeight = HOUR_HEIGHT * zoomScale;
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -66,8 +66,8 @@ export default function Timeline() {
     : null;
 
   const displaySessions: Session[] = liveSession
-    ? [...sessions, liveSession]
-    : sessions;
+    ? [...stats.todaySessions, liveSession]
+    : stats.todaySessions;
 
   return (
     <Background>

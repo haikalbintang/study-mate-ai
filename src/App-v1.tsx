@@ -8,7 +8,7 @@ import type { ViewKey } from "@/types/shared";
 import NavBar from "./layouts/NavBar";
 
 function App() {
-  const [activeView, setActiveView] = useState<ViewKey>("settings");
+  const [activeView, setActiveView] = useState<ViewKey>("dashboard");
 
   return (
     <div

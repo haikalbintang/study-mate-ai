@@ -13,7 +13,7 @@ import {
   type ReactNode,
 } from "react";
 import { PomodoroContext } from "./usePomodoro";
-import { DAILY_GOAL_SESSIONS, MODES, PACE } from "@/data/shared";
+import { MODES, PACE } from "@/data/shared";
 import {
   clampDuration,
   playChime,
@@ -22,6 +22,8 @@ import {
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { addDays, dayKey, isSameDay, minutesOf } from "@/utils/date-helper";
+import { useSettings } from "./useSettings";
+import { useTodayBoundary } from "./useTodayBoundary";
 
 const MODE_NAME: Record<ModeKey, SessionKind> = {
   0: "focus",
@@ -29,38 +31,9 @@ const MODE_NAME: Record<ModeKey, SessionKind> = {
   2: "longBreak",
 };
 
-interface AppSettings {
-  dailyGoal: number;
-  cyclesBeforeLongBreak: number;
-  autoStartNext: boolean;
-  soundEnabled: boolean;
-}
-
-const SETTINGS_STORAGE_KEY = "pomodoro-settings";
-
-const DEFAULT_SETTINGS: AppSettings = {
-  dailyGoal: 4,
-  cyclesBeforeLongBreak: 4,
-  autoStartNext: false,
-  soundEnabled: true,
-};
-
-function loadSettings(): AppSettings {
-  try {
-    const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
-    if (!raw) return DEFAULT_SETTINGS;
-    return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
-  } catch {
-    return DEFAULT_SETTINGS;
-  }
-}
-
 export function PomodoroProvider({ children }: { children: ReactNode }) {
-  const [todayTimestamp, setTodayTimestamp] = useState(() => {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    return d.getTime();
-  });
+  const settings = useSettings();
+  const todayTimestamp = useTodayBoundary();
   const [mode, setMode] = useState<ModeKey>(0);
   const [isRunning, setIsRunning] = useState(false);
   const [showSettings, setShowSettings] = useState(true);
@@ -82,45 +55,12 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   ]);
   const [completedFocusSessions, setCompletedFocusSessions] = useState(0);
 
-  const [settings, setSettings] = useState<AppSettings>(loadSettings);
-
-  useEffect(() => {
-    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
-  }, [settings]);
-
-  const setDailyGoal = useCallback((value: number) => {
-    setSettings((prev) => ({ ...prev, dailyGoal: value }));
-  }, []);
-
-  const setCyclesBeforeLongBreak = useCallback((value: number) => {
-    setSettings((prev) => ({ ...prev, cyclesBeforeLongBreak: value }));
-  }, []);
-
-  const setAutoStartNext = useCallback((value: boolean) => {
-    setSettings((prev) => ({ ...prev, autoStartNext: value }));
-  }, []);
-
-  const setSoundEnabled = useCallback((value: boolean) => {
-    setSettings((prev) => ({ ...prev, soundEnabled: value }));
-  }, []);
-
   const sessionFromDb = useLiveQuery(
     () => db.sessions.orderBy("start").toArray(),
     [],
   );
 
   const sessions: Session[] = sessionFromDb ?? [];
-
-  useEffect(() => {
-    const checkMidnight = setInterval(() => {
-      const currentStartOfDay = new Date().setHours(0, 0, 0, 0);
-      if (currentStartOfDay !== todayTimestamp) {
-        setTodayTimestamp(currentStartOfDay);
-      }
-    }, 60000); // Check once per minute, not every second
-
-    return () => clearInterval(checkMidnight);
-  }, [todayTimestamp]);
 
   const [activeSession, setActiveSession] = useState<ActiveSession | null>(
     null,
@@ -314,7 +254,7 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
         .filter((s) => s.modeKey === 0 && s.completed)
         .map((s) => dayKey(s.start)),
     );
-    let streak = 8;
+    let streak = 0;
     let cursor = today;
     while (completedFocusDayKeys.has(dayKey(cursor.getTime()))) {
       streak += 1;
@@ -462,14 +402,7 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
         clearSessions,
         clearAllData,
 
-        dailyGoal: settings.dailyGoal,
-        cyclesBeforeLongBreak: settings.cyclesBeforeLongBreak,
-        autoStartNext: settings.autoStartNext,
-        soundEnabled: settings.soundEnabled,
-        setDailyGoal,
-        setCyclesBeforeLongBreak,
-        setAutoStartNext,
-        setSoundEnabled,
+        ...settings,
 
         mode,
         isRunning,
