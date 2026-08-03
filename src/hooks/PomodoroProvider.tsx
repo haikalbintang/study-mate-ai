@@ -8,7 +8,7 @@ import {
 } from "react";
 import { PomodoroContext } from "./usePomodoro";
 import { MODES, PACE } from "@/data/shared";
-import { clampDuration, requestNotificationPermission } from "@/utils/helper";
+import { clampDuration } from "@/utils/helper";
 import { db } from "@/db/db";
 import { useSettings } from "./useSettings";
 import { useTodayBoundary } from "./useTodayBoundary";
@@ -18,6 +18,7 @@ import { logSession } from "@/utils/logSession";
 import { useSessionsFromDb } from "./useSessionFromDb";
 import { useDailyStats } from "./useDailyStats";
 import {
+  requestNotificationPermission,
   triggerChimeSound,
   triggerNotification,
 } from "@/utils/notification-helper";

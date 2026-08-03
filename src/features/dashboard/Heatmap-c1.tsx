@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { Session } from "@/types/shared";
 import usePomodoro from "@/hooks/usePomodoro";
 
@@ -10,9 +10,9 @@ interface DayCell {
   isFuture: boolean;
 }
 
-const WEEKS_TO_SHOW = 16;
-const CELL_SIZE = 11;
-const CELL_GAP = 3;
+const WEEKS_TO_SHOW = 9;
+const CELL_SIZE = 12;
+const CELL_GAP = 3.5;
 const COL_WIDTH = CELL_SIZE + CELL_GAP;
 
 // Only label every other weekday row, same convention GitHub uses, to keep
@@ -48,11 +48,11 @@ function levelColor(minutes: number): string {
   return "#c25b3a";
 }
 
-function formatTooltipDate(d: Date): string {
+function formatDetailDate(d: Date): string {
   return d.toLocaleDateString(undefined, {
+    weekday: "short",
     month: "short",
     day: "numeric",
-    year: "numeric",
   });
 }
 
@@ -108,6 +108,15 @@ export default function Heatmap() {
   );
   const weeks = useMemo(() => buildWeeks(focusSessions), [focusSessions]);
 
+  const [hoveredDay, setHoveredDay] = useState<DayCell | null>(null);
+  const [selectedDay, setSelectedDay] = useState<DayCell | null>(null);
+  const displayedDay = hoveredDay ?? selectedDay;
+
+  function handleDayClick(day: DayCell) {
+    if (day.isFuture) return;
+    setSelectedDay((prev) => (prev?.key === day.key ? null : day));
+  }
+
   // Which week columns start a new month, for the label row up top.
   const monthMarkers = useMemo(() => {
     const markers: { weekIndex: number; label: string }[] = [];
@@ -126,63 +135,117 @@ export default function Heatmap() {
   }, [weeks]);
 
   const activeDays = weeks.flat().filter((d) => d.minutes > 0).length;
+  const swatchColor = displayedDay ? levelColor(displayedDay.minutes) : null;
+  const isEmptyDay = displayedDay ? displayedDay.minutes <= 0 : false;
 
   return (
     <div>
-      <div
-        className="relative text-[10px] text-[#9a988f]"
-        style={{ height: "14px", marginLeft: "21px" }}
-      >
-        {monthMarkers.map((m) => (
-          <span
-            key={m.weekIndex}
-            className="absolute"
-            style={{ left: `${m.weekIndex * COL_WIDTH}px` }}
+      <div className="flex items-stretch gap-3">
+        <div className="min-w-0 flex-1">
+          <div
+            className="relative text-[10px] text-[#9a988f]"
+            style={{ height: "14px", marginLeft: "21px" }}
           >
-            {m.label}
-          </span>
-        ))}
-      </div>
+            {monthMarkers.map((m) => (
+              <span
+                key={m.weekIndex}
+                className="absolute"
+                style={{ left: `${m.weekIndex * COL_WIDTH}px` }}
+              >
+                {m.label}
+              </span>
+            ))}
+          </div>
 
-      <div className="flex gap-[3px]">
-        <div
-          className="flex flex-col gap-[3px] shrink-0"
-          style={{ width: "18px" }}
-        >
-          {WEEKDAY_LABELS.map((label, i) => (
+          <div className="flex gap-[3px]">
             <div
-              key={i}
-              className="text-[9px] text-[#9a988f] flex items-center"
-              style={{ height: `${CELL_SIZE}px` }}
+              className="flex flex-col gap-[3px] shrink-0"
+              style={{ width: "18px" }}
             >
-              {label}
-            </div>
-          ))}
-        </div>
-
-        <div className="flex gap-[3px] overflow-x-auto">
-          {weeks.map((week, wi) => (
-            <div key={wi} className="flex flex-col gap-[3px]">
-              {week.map((day) => (
+              {WEEKDAY_LABELS.map((label, i) => (
                 <div
-                  key={day.key}
-                  title={
-                    day.isFuture
-                      ? undefined
-                      : `${formatTooltipDate(day.date)} — ${day.minutes}m focus, ${day.sessionCount} sesi`
-                  }
-                  className="rounded-[2px]"
-                  style={{
-                    width: `${CELL_SIZE}px`,
-                    height: `${CELL_SIZE}px`,
-                    backgroundColor: day.isFuture
-                      ? "transparent"
-                      : levelColor(day.minutes),
-                  }}
-                />
+                  key={i}
+                  className="text-[9px] text-[#9a988f] flex items-center"
+                  style={{ height: `${CELL_SIZE}px` }}
+                >
+                  {label}
+                </div>
               ))}
             </div>
-          ))}
+
+            <div className="flex gap-[3.5px]">
+              {weeks.map((week, wi) => (
+                <div key={wi} className="flex flex-col gap-[3.5px]">
+                  {week.map((day) => (
+                    <div
+                      key={day.key}
+                      onMouseEnter={() => !day.isFuture && setHoveredDay(day)}
+                      onMouseLeave={() => setHoveredDay(null)}
+                      onClick={() => handleDayClick(day)}
+                      className={`rounded-[2px] transition-transform duration-100 ${
+                        day.isFuture ? "" : "cursor-pointer hover:scale-110"
+                      }`}
+                      style={{
+                        width: `${CELL_SIZE}px`,
+                        height: `${CELL_SIZE}px`,
+                        backgroundColor: day.isFuture
+                          ? "transparent"
+                          : levelColor(day.minutes),
+                        outline:
+                          selectedDay?.key === day.key
+                            ? "1.5px solid #2b2a26"
+                            : "none",
+                        outlineOffset: "1px",
+                      }}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Detail panel — sits beside the grid instead of above it, so
+            hovering/tapping never shifts the grid's position. Fixed width
+            and vertically centered against the grid's own height. */}
+        <div className="flex w-[86px] text-[#9a988f] shrink-0 flex-col justify-center rounded-xl bg-[#f8f7f2] px-2 py-2">
+          {displayedDay ? (
+            <>
+              <div className="flex items-center gap-1.5">
+                <span
+                  className="inline-block shrink-0 rounded-[2px]"
+                  style={{
+                    width: "11px",
+                    height: "11px",
+                    backgroundColor: swatchColor ?? undefined,
+                  }}
+                />
+                <span className="text-[10px] leading-tight text-[#9a988f]">
+                  {formatDetailDate(displayedDay.date)}
+                </span>
+              </div>
+              <div
+                className="mt-1.5 text-xl font-semibold leading-none"
+                style={{
+                  color: isEmptyDay ? "#9a988f" : (swatchColor ?? "#2b2a26"),
+                }}
+              >
+                {displayedDay.minutes}
+                <span className="ml-0.5 text-lg font-normal text-[#9a988f]">
+                  min
+                </span>
+              </div>
+              <div className="mt-1 text-[10px] text-[#9a988f]">
+                {displayedDay.sessionCount > 0
+                  ? `${displayedDay.sessionCount} session${displayedDay.sessionCount === 1 ? "" : "s"}`
+                  : "No focus logged"}
+              </div>
+            </>
+          ) : (
+            <span className="text-[11px] leading-snug text-[#9a988f]">
+              Hover or tap a day for details
+            </span>
+          )}
         </div>
       </div>
 
@@ -197,8 +260,8 @@ export default function Heatmap() {
               key={m}
               className="rounded-xs"
               style={{
-                width: "9px",
-                height: "9px",
+                width: "11px",
+                height: "11px",
                 backgroundColor: levelColor(m),
               }}
             />

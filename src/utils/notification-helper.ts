@@ -9,6 +9,13 @@ const NOTIFICATION_COPY: Record<ModeKey, { title: string; body: string }> = {
   },
 };
 
+export async function requestNotificationPermission() {
+  if (!("Notification" in window)) return false;
+  if (Notification.permission === "granted") return true;
+  const permission = await Notification.requestPermission();
+  return permission === "granted";
+}
+
 /**
  * Plays a soft 2-note chime using Web Audio API.
  */
