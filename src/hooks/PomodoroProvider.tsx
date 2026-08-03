@@ -8,11 +8,7 @@ import {
 } from "react";
 import { PomodoroContext } from "./usePomodoro";
 import { MODES, PACE } from "@/data/shared";
-import {
-  clampDuration,
-  playChime,
-  requestNotificationPermission,
-} from "@/utils/helper";
+import { clampDuration, requestNotificationPermission } from "@/utils/helper";
 import { db } from "@/db/db";
 import { useSettings } from "./useSettings";
 import { useTodayBoundary } from "./useTodayBoundary";
@@ -21,7 +17,10 @@ import { useActiveSessionClock } from "./useActiveSessionClock";
 import { logSession } from "@/utils/logSession";
 import { useSessionsFromDb } from "./useSessionFromDb";
 import { useDailyStats } from "./useDailyStats";
-import { notifyCompletion } from "@/utils/notifyCompletion";
+import {
+  triggerChimeSound,
+  triggerNotification,
+} from "@/utils/notification-helper";
 
 export function PomodoroProvider({ children }: { children: ReactNode }) {
   const settings = useSettings();
@@ -115,8 +114,8 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     if (!(isFinished && isRunning)) return;
 
     function handleTimerCompletion() {
-      if (settings.soundEnabled) playChime();
-      notifyCompletion(mode);
+      if (settings.soundEnabled) triggerChimeSound();
+      triggerNotification(mode);
       document.title = "Time's Up! — Pomodoro";
       setIsRunning(false);
       finishSession();

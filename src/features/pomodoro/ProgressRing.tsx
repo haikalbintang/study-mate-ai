@@ -1,6 +1,6 @@
 import { CIRCUMFERENCE, RADIUS } from "@/data/shared";
 import usePomodoro from "@/hooks/usePomodoro";
-import { formatTime } from "@/utils/helper";
+import { formatTime } from "@/utils/format-time-helper";
 
 export default function ProgressRing() {
   const {
