@@ -83,21 +83,21 @@ export default function Timeline() {
           <div className="flex items-center gap-2">
             <button
               onClick={zoomOut}
-              className="bg-[#f0ede4] hover:bg-[#e4e1d7] border-none text-[#5a5850] text-xs font-bold cursor-pointer w-6 h-6 rounded flex items-center justify-center transition-colors"
+              className="bg-muted hover:bg-accent border-none text-foreground text-xs font-bold cursor-pointer w-6 h-6 rounded flex items-center justify-center transition-colors"
               title="Zoom Out"
             >
               -
             </button>
             <button
               onClick={zoomIn}
-              className="bg-[#f0ede4] hover:bg-[#e4e1d7] border-none text-[#5a5850] text-xs font-bold cursor-pointer w-6 h-6 rounded flex items-center justify-center transition-colors"
+              className="bg-muted hover:bg-accent border-none text-foreground text-xs font-bold cursor-pointer w-6 h-6 rounded flex items-center justify-center transition-colors"
               title="Zoom In"
             >
               +
             </button>
             <button
               onClick={clearSessions}
-              className="bg-none border-none text-[#9a988f] text-xs cursor-pointer p-0 ml-2"
+              className="bg-none border-none text-muted-foreground text-xs cursor-pointer p-0 ml-2"
             >
               Clear
             </button>
@@ -112,8 +112,7 @@ export default function Timeline() {
 
         <div
           ref={scrollRef}
-          className={`${displaySessions.length === 0 ? "h-[calc(100vh-301px)]" : "h-[calc(100vh-263px)]"} overflow-y-auto border border-[#ececE4] rounded-xl bg-[#fbfaf7] pt-6 touch-pan-y
-`}
+          className={`${displaySessions.length === 0 ? "h-[calc(100vh-301px)]" : "h-[calc(100vh-263px)]"} overflow-y-auto border border-border rounded-xl bg-background pt-6 touch-pan-y`}
         >
           <div
             className="relative"
@@ -128,16 +127,10 @@ export default function Timeline() {
                   top: `${hour === 25 ? hour * currentHourHeight - 26 : hour * currentHourHeight}px`,
                 }}
               >
-                <span
-                  className="w-6 shrink-0 text-[11px] text-[#a4a296] text-right pr-2 -translate-y-2
-"
-                >
+                <span className="w-6 shrink-0 text-[11px] text-muted-foreground text-right pr-2 -translate-y-2">
                   {hour <= 24 ? hour : ""}
                 </span>
-                <div
-                  className="flex-1 border-t border-[#deded3] mt-0
-"
-                />
+                <div className="flex-1 border-t border-border mt-0" />
               </div>
             ))}
 

@@ -8,9 +8,9 @@ export default function SessionNav() {
       {MODES.map((m) => (
         <button
           key={m.key}
-          className={`bg-transparent text-sm font-medium py-1.5 px-0.5 cursor-pointer text-[#8a8a86] border-b-[3px] border-[#8a8a86] `}
+          className="bg-transparent text-sm font-medium py-1.5 px-0.5 cursor-pointer border-b-[3px]"
           style={{
-            color: mode === m.key ? m.color : "#8a8a86",
+            color: mode === m.key ? m.color : "var(--muted-foreground)",
             borderBottom:
               mode === m.key ? `3px solid ${m.color}` : "3px solid transparent",
           }}

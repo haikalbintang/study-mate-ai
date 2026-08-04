@@ -143,7 +143,7 @@ export default function Heatmap() {
       <div className="flex items-stretch gap-3">
         <div className="min-w-0 flex-1">
           <div
-            className="relative text-[10.5px] text-[#9a988f]"
+            className="relative text-[10.5px] text-muted-foreground"
             style={{ height: "16px", marginLeft: "22.5px" }}
           >
             {monthMarkers.map((m) => (
@@ -165,7 +165,7 @@ export default function Heatmap() {
               {WEEKDAY_LABELS.map((label, i) => (
                 <div
                   key={i}
-                  className="text-[10.5px] text-[#9a988f] flex items-center"
+                  className="text-[10.5px] text-muted-foreground flex items-center"
                   style={{ height: `${CELL_SIZE}px` }}
                 >
                   {label}
@@ -193,7 +193,7 @@ export default function Heatmap() {
                           : levelColor(day.minutes),
                         outline:
                           selectedDay?.key === day.key
-                            ? "1.5px solid #2b2a26"
+                            ? "1.5px solid var(--foreground)"
                             : "none",
                         outlineOffset: "1px",
                       }}
@@ -208,7 +208,7 @@ export default function Heatmap() {
         {/* Detail panel — sits beside the grid instead of above it, so
             hovering/tapping never shifts the grid's position. Fixed width
             and vertically centered against the grid's own height. */}
-        <div className="flex w-[86px] text-[#9a988f] shrink-0 flex-col justify-center rounded-xl bg-[#f8f7f2] px-2 py-2 mt-3.5">
+        <div className="flex w-[86px] text-muted-foreground shrink-0 flex-col justify-center rounded-xl bg-accent px-2 py-2 mt-3.5">
           {displayedDay ? (
             <>
               <div className="flex items-center gap-1.5">
@@ -220,36 +220,38 @@ export default function Heatmap() {
                     backgroundColor: swatchColor ?? undefined,
                   }}
                 />
-                <span className="text-[11px] leading-tight text-[#9a988f]">
+                <span className="text-[11px] leading-tight text-muted-foreground">
                   {formatDetailDate(displayedDay.date)}
                 </span>
               </div>
               <div
                 className="mt-1.5 text-xl font-bold leading-none"
                 style={{
-                  color: isEmptyDay ? "#9a988f" : (swatchColor ?? "#2b2a26"),
+                  color: isEmptyDay
+                    ? "var(--muted-foreground)"
+                    : (swatchColor ?? "var(--foreground)"),
                 }}
               >
                 {displayedDay.minutes}
-                <span className="ml-0.5 text-lg font-medium text-[#2b2a26]">
+                <span className="ml-0.5 text-lg font-medium text-foreground">
                   min
                 </span>
               </div>
-              <div className="mt-1 text-[10.5px] text-[#9a988f]">
+              <div className="mt-1 text-[10.5px] text-muted-foreground">
                 {displayedDay.sessionCount > 0
                   ? `${displayedDay.sessionCount} session${displayedDay.sessionCount === 1 ? "" : "s"}`
                   : "No focus logged"}
               </div>
             </>
           ) : (
-            <span className="text-[11px] leading-snug text-[#9a988f]">
+            <span className="text-[11px] leading-snug text-muted-foreground">
               Hover or tap a day for details
             </span>
           )}
         </div>
       </div>
 
-      <div className="flex items-center justify-between mt-2 text-[10.5px] text-[#9a988f]">
+      <div className="flex items-center justify-between mt-2 text-[10.5px] text-muted-foreground">
         <span className="mr-10">
           {activeDays} active days in the last {WEEKS_TO_SHOW} weeks
         </span>

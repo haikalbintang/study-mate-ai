@@ -59,9 +59,7 @@ export default function Settings() {
         <SectionTitle>Cycle & Goal</SectionTitle>
         <div className="flex flex-col gap-3.5">
           <label className="flex items-center justify-between text-sm">
-            <span className="text-[#2b2a26] dark:text-[#f0efe9]">
-              Session before long break
-            </span>
+            <span className="text-foreground">Session before long break</span>
             <input
               type="number"
               min={2}
@@ -69,13 +67,11 @@ export default function Settings() {
               value={cyclesInput}
               onChange={(e) => setCyclesInput(e.target.value)}
               onBlur={(e) => commitCycles(e.target.value)}
-              className="w-14 px-2 py-1 rounded-md border border-[#d8d6cd] text-sm text-center dark:border-[#3a3833] dark:bg-[#242320] dark:text-[#f0efe9]"
+              className="w-14 px-2 py-1 rounded-md border border-input bg-background text-sm text-center text-foreground"
             />
           </label>
           <label className="flex items-center justify-between text-sm">
-            <span className="text-[#2b2a26] dark:text-[#f0efe9]">
-              Daily focus session goal
-            </span>
+            <span className="text-foreground">Daily focus session goal</span>
             <input
               type="number"
               min={1}
@@ -83,7 +79,7 @@ export default function Settings() {
               value={dailyGoalInput}
               onChange={(e) => setDailyGoalInput(e.target.value)}
               onBlur={(e) => commitDailyGoal(e.target.value)}
-              className="w-14 px-2 py-1 rounded-md border border-[#d8d6cd] text-sm text-center dark:border-[#3a3833] dark:bg-[#242320] dark:text-[#f0efe9]"
+              className="w-14 px-2 py-1 rounded-md border border-input bg-background text-sm text-center text-foreground"
             />
           </label>
         </div>
@@ -93,10 +89,8 @@ export default function Settings() {
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between text-sm">
             <div>
-              <div className="text-[#2b2a26] dark:text-[#f0efe9]">
-                Auto-start next session
-              </div>
-              <div className="text-[11px] text-[#9a988f] mt-0.5">
+              <div className="text-foreground">Auto-start next session</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">
                 Immediately start the next session without having to click
                 Start{" "}
               </div>
@@ -105,10 +99,8 @@ export default function Settings() {
           </div>
           <div className="flex items-center justify-between text-sm">
             <div>
-              <div className="text-[#2b2a26] dark:text-[#f0efe9]">
-                Sound notifications
-              </div>
-              <div className="text-[11px] text-[#9a988f] mt-0.5">
+              <div className="text-foreground">Sound notifications</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">
                 Play chime when session is complete
               </div>
             </div>
@@ -116,10 +108,8 @@ export default function Settings() {
           </div>
           <div className="flex items-center justify-between text-sm">
             <div>
-              <div className="text-[#2b2a26] dark:text-[#f0efe9]">
-                Dark mode
-              </div>
-              <div className="text-[11px] text-[#9a988f] mt-0.5">
+              <div className="text-foreground">Dark mode</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">
                 Follows your system by default until you switch it here
               </div>
             </div>
@@ -128,14 +118,14 @@ export default function Settings() {
         </div>
 
         {/* Danger zone */}
-        <div className="mt-6 pt-4 border-t border-[#ececE4] dark:border-[#3a3833]">
+        <div className="mt-6 pt-4 border-t border-border">
           <button
             onClick={handleResetClick}
             onBlur={() => setConfirmingReset(false)}
             className={`w-full text-sm font-medium rounded-lg py-2.5 border transition-colors ${
               confirmingReset
-                ? "bg-[#c25b3a] text-white border-[#c25b3a]"
-                : "bg-white text-[#c25b3a] border-[#e8cabf] hover:bg-[#fdf3ea] dark:bg-[#242320] dark:hover:bg-[#2c2a25]"
+                ? "bg-destructive text-white border-destructive"
+                : "bg-card text-destructive border-[#e8cabf] hover:bg-accent"
             }`}
           >
             {confirmingReset ? "Are you sure?" : "Delete all data"}

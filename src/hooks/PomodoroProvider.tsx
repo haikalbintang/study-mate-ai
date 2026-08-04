@@ -22,11 +22,14 @@ import {
   triggerChimeSound,
   triggerNotification,
 } from "@/utils/notification-helper";
+import { useSyncDarkMode } from "./useSyncDarkMode";
 
 export function PomodoroProvider({ children }: { children: ReactNode }) {
   const settings = useSettings();
   const todayTimestamp = useTodayBoundary();
   const sessions = useSessionsFromDb();
+
+  useSyncDarkMode(settings.darkMode);
 
   const { activeSession, activeSessionRef, now, beginSession, endSession } =
     useActiveSessionClock();

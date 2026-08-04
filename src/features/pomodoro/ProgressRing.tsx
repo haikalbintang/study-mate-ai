@@ -24,7 +24,7 @@ export default function ProgressRing() {
           cy="140"
           r={RADIUS}
           fill="none"
-          stroke="#e9e7e0"
+          stroke="var(--muted)"
           strokeWidth="10"
         />
         <circle
@@ -44,7 +44,7 @@ export default function ProgressRing() {
         />
       </svg>
       <div className="absolute flex flex-col items-center justify-center">
-        <div className="text-5xl font-semibold tracking-[1px] text-[#2b2a26] tabular-nums">
+        <div className="text-5xl font-semibold tracking-[1px] text-foreground tabular-nums">
           {formatTime(secondsLeft)}
         </div>
         <div className="mt-2 text-xl tracking-[3px] text-[#c9a25b]">

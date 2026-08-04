@@ -1,6 +1,24 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>
+      (function () {
+        try {
+          var raw = localStorage.getItem("pomodoro-settings");
+          var stored = raw ? JSON.parse(raw) : null;
+          var prefersDark =
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches;
+          var dark =
+            stored && "darkMode" in stored ? stored.darkMode : prefersDark;
+          if (dark) document.documentElement.classList.add("dark");
+        } catch (e) {
+          // If localStorage is unavailable or the stored JSON is malformed,
+          // just fall through to light mode rather than throwing before the
+          // app has even mounted.
+        }
+      })();
+    </script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
