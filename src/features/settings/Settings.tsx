@@ -6,6 +6,7 @@ import Card from "@/components/common/Card";
 import SectionTitle from "../dashboard/SectionTitle";
 import Toggle from "./Toggle";
 import Durations from "./Durations";
+import DarkModeToggle from "./DarkModeToggle";
 
 export default function Settings() {
   const {
@@ -50,8 +51,11 @@ export default function Settings() {
   return (
     <Background>
       <Card>
-        <Title>Settings</Title>
+        <div className="flex items-center justify-between">
+          <Title>Settings</Title>
 
+          <DarkModeToggle />
+        </div>
         <SectionTitle>Durations (minute)</SectionTitle>
         <Durations />
 
@@ -106,7 +110,7 @@ export default function Settings() {
             </div>
             <Toggle checked={soundEnabled} onChange={setSoundEnabled} />
           </div>
-          <div className="flex items-center justify-between text-sm">
+          {/* <div className="flex items-center justify-between text-sm">
             <div>
               <div className="text-foreground">Dark mode</div>
               <div className="text-[11px] text-muted-foreground mt-0.5">
@@ -114,7 +118,7 @@ export default function Settings() {
               </div>
             </div>
             <Toggle checked={darkMode} onChange={setDarkMode} />
-          </div>
+          </div> */}
         </div>
 
         {/* Danger zone */}
