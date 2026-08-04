@@ -18,8 +18,6 @@ export default function Settings() {
     setAutoStartNext,
     soundEnabled,
     setSoundEnabled,
-    darkMode,
-    setDarkMode,
     clearAllData,
   } = usePomodoro();
 
