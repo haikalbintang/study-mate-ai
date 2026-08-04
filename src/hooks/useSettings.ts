@@ -7,9 +7,15 @@ export interface AppSettings {
   autoStartNext: boolean;
   soundEnabled: boolean;
   durations: number[];
+  darkMode: boolean;
 }
 
 const SETTINGS_STORAGE_KEY = "pomodoro-settings";
+
+function getSystemPrefersDark(): boolean {
+  if (typeof window === "undefined" || !window.matchMedia) return false;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
 
 const DEFAULT_SETTINGS: AppSettings = {
   dailyGoal: 4,
@@ -17,6 +23,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   autoStartNext: false,
   soundEnabled: true,
   durations: [MODES[0].minutes, MODES[1].minutes, MODES[2].minutes],
+  darkMode: getSystemPrefersDark(),
 };
 
 function loadSettings(): AppSettings {
@@ -65,16 +72,23 @@ export function useSettings() {
     }));
   }, []);
 
+  const setDarkMode = useCallback(
+    (value: boolean) => setSettings((prev) => ({ ...prev, darkMode: value })),
+    [],
+  );
+
   return {
     dailyGoal: settings.dailyGoal,
     cyclesBeforeLongBreak: settings.cyclesBeforeLongBreak,
     autoStartNext: settings.autoStartNext,
     soundEnabled: settings.soundEnabled,
     durations: settings.durations,
+    darkMode: settings.darkMode,
     setDailyGoal,
     setCyclesBeforeLongBreak,
     setAutoStartNext,
     setSoundEnabled,
     setDurations,
+    setDarkMode,
   };
 }

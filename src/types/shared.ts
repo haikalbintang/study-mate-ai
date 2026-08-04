@@ -62,10 +62,12 @@ export interface PomodoroContextValue {
   cyclesBeforeLongBreak: number;
   autoStartNext: boolean;
   soundEnabled: boolean;
+  darkMode: boolean;
   setDailyGoal: (value: number) => void;
   setCyclesBeforeLongBreak: (value: number) => void;
   setAutoStartNext: (value: boolean) => void;
   setSoundEnabled: (value: boolean) => void;
+  setDarkMode: (value: boolean) => void;
 
   mode: ModeKey;
   isRunning: boolean;

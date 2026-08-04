@@ -97,9 +97,8 @@ export async function triggerNotification(mode: ModeKey): Promise<void> {
 
   try {
     // Cek apakah aplikasi berjalan sebagai PWA (Standalone/Installed) atau di Mobile Safari
-    const isPWA =
-      window.matchMedia("(display-mode: standalone)").matches ||
-      (navigator as any).standalone; // khusus iOS Safari standalone
+    const isPWA = window.matchMedia("(display-mode: standalone)").matches;
+    // || (navigator as any).standalone; // khusus iOS Safari standalone
 
     // 2. Mobile & PWA approach (Hanya dipanggil jika benar-benar berjalan sebagai PWA)
     if (isPWA && "serviceWorker" in navigator) {
