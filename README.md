@@ -101,8 +101,10 @@ Streaks, best-focus-hour, day-over-day comparisons, and the heatmap are all deri
 
 ## Screenshots
 
-![Timer](/public/Timer.png)![Focus](/public/Focus.png)![Short Break](/public/ShortBreak.png)![Long Break](/public/LongBreak.png)![Timeline](/public/Timeline.png)![Settings](/public/Settings.png)
-![Auto Start](/public/AutoStart.png)![Dark](/public/Dark.png)![Dark 2](/public/Dark2.png)![Dark 3](/public/Dark3.png)![Dashboard](/public/Dashboard.png)![Dashboard 2](/public/Dashboard2.png)
+![SS](/public/SS.png)
+
+<!-- ![Timer](/public/Timer.png)![Focus](/public/Focus.png)![Short Break](/public/ShortBreak.png)![Long Break](/public/LongBreak.png)![Timeline](/public/Timeline.png)![Settings](/public/Settings.png)
+![Auto Start](/public/AutoStart.png)![Dark](/public/Dark.png)![Dark 2](/public/Dark2.png)![Dark 3](/public/Dark3.png)![Dashboard](/public/Dashboard.png)![Dashboard 2](/public/Dashboard2.png) -->
 
 ---
 
