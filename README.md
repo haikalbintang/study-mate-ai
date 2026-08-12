@@ -101,6 +101,8 @@ Streaks, best-focus-hour, day-over-day comparisons, and the heatmap are all deri
 
 ## Screenshots
 
+<img src="/public/Timer.png" width="300" height="300">
+
 ![Timer](/public/Timer.png)
 ![Focus](/public/Focus.png)
 ![Short Break](/public/ShortBreak.png)
