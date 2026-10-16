@@ -18,7 +18,7 @@ export default function Durations() {
           </span>
           <input
             type="number"
-            min={1}
+            min={0}
             max={120}
             value={inputValues[m.key]}
             onChange={(e) =>

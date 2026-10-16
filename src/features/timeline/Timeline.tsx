@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { MODES, HOUR_HEIGHT, MAX_ZOOM, MIN_ZOOM } from "@/data/shared";
-import { minutesSinceMidnight } from "../../utils/helper";
+import { minutesSinceMidnight } from "@/utils/date-helper";
 import usePomodoro from "@/hooks/usePomodoro";
 import type { Session } from "@/types/shared";
 import Title from "@/components/common/Title";

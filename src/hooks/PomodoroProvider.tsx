@@ -8,7 +8,7 @@ import {
 } from "react";
 import { PomodoroContext } from "./usePomodoro";
 import { MODES, PACE } from "@/data/shared";
-import { clampDuration } from "@/utils/helper";
+import { clampDuration } from "@/utils/format-time-helper";
 import { db } from "@/db/db";
 import { useSettings } from "./useSettings";
 import { useTodayBoundary } from "./useTodayBoundary";
@@ -89,7 +89,7 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
         : 1
       : 0;
   const actionButtonColor = isFinished ? MODES[nextMode].color : activeColor;
-  const progress = 1 - secondsLeft / totalSeconds;
+  const progress = totalSeconds > 0 ? 1 - secondsLeft / totalSeconds : 0;
 
   useEffect(() => {
     if (isRunning) {

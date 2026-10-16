@@ -5,6 +5,10 @@ export function formatTime(totalSeconds: number): string {
 }
 
 export function formatDurationMinutes(ms: number): string {
-  const mins = Math.max(1, Math.round(ms / 60000));
+  const mins = Math.max(0, Math.round(ms / 60000));
   return `${mins} menit`;
+}
+
+export function clampDuration(value: string): number {
+  return Math.max(0, Math.min(120, Number(value) || 0));
 }
